@@ -90,10 +90,12 @@
           fill=activationcolor!8] (left) at (-1,-2.3) {Path A};
         \node[examplebox,minimum width=16mm,draw=accent,
           fill=wash] (right) at (1,-2.3) {Path B};
-        \draw[flow,draw=activationcolor] (check.west) -| node[pos=0.7,left,
-          font=\scriptsize,text=ink] {Yes} (left.north);
-        \draw[flow,draw=accent] (check.east) -| node[pos=0.7,right,
-          font=\scriptsize,text=ink] {No} (right.north);
+        \draw[flow,draw=activationcolor] (check.west)
+          -- node[above,font=\scriptsize,text=ink] {Yes} (-2.05,-0.2)
+          |- (left.west);
+        \draw[flow,draw=accent] (check.east)
+          -- node[above,font=\scriptsize,text=ink] {No} (2.05,-0.2)
+          |- (right.east);
       \end{tikzpicture}
     \end{column}
     \begin{column}{0.31\textwidth}
@@ -114,7 +116,7 @@
       \end{tikzpicture}
     \end{column}
   \end{columns}
-  \vspace{1mm}
+  \vspace{5mm}
   \begin{columns}[T,onlytextwidth]
     \begin{column}{0.42\textwidth}
       \centering
