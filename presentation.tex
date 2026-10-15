@@ -4,7 +4,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
 
 \definecolor{ink}{HTML}{172B4D}
 \definecolor{accent}{HTML}{007F82}
@@ -53,46 +53,71 @@
   \vfill
 \end{frame}
 
-\begin{frame}{Control when steering is applied}
-  Activation steering adds a behavior vector to a model's hidden state.
-  CAST adds a condition that decides when to apply it.
+% A style example only: these diagrams make no claims about paper results.
+\begin{frame}{Diagrams and visual language}
+  \tikzset{
+    examplebox/.style={rounded corners=3pt,thick,minimum height=8mm,
+      minimum width=22mm,align=center,font=\small},
+    flow/.style={-{Latex[length=2mm]},thick,draw=muted},
+    vector/.style={-{Latex[length=2mm]},very thick}}
 
-  \vspace{7mm}
-  \begin{center}
-  \begin{tikzpicture}[
-    box/.style={draw=accent,fill=wash,rounded corners=3pt,
-      minimum height=13mm,text width=31mm,align=center,font=\small},
-    flow/.style={-{Latex[length=2mm]},thick,draw=accent},
-    node distance=10mm]
-    \node[box,draw=activationcolor,fill=activationcolor!8] (state) {Prompt\\activations};
-    \node[box,draw=conditioncolor,fill=conditioncolor!10,right=of state] (gate) {Condition check\\$g\in\{0,1\}$};
-    \node[box,right=of gate] (steer) {Apply behavior\\if $g=1$};
-    \draw[flow] (state) -- (gate);
-    \draw[flow] (gate) -- (steer);
-  \end{tikzpicture}
-  \end{center}
-  \vspace{3mm}
-  \[
-    h' = \textcolor{activationcolor}{h}
-      + \textcolor{conditioncolor}{g}\,\alpha\,\textcolor{accent}{v}
-  \]
-  {\small \textcolor{activationcolor}{$h$}: hidden state\quad
-   \textcolor{accent}{$v$}: behavior vector\quad
-   $\alpha$: steering strength}
-  \papersource{Section 3.1; schematic notation}
-\end{frame}
-
-\begin{frame}{Three questions about CAST}
-  \begin{enumerate}
-    \setlength{\itemsep}{5mm}
-    \item \textbf{Why selective refusal?}\\
-      What changes when steering is conditional?
-    \item \textbf{How does CAST work?}\\
-      Condition vectors, behavior vectors, and the gate.
-    \item \textbf{What does the evidence establish?}\\
-      The paper's results, examples, and limitations.
-  \end{enumerate}
-  \vfill
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.31\textwidth}
+      \centering
+      {\small\bfseries Process\par}
+      \vspace{3mm}
+      \begin{tikzpicture}
+        \path[use as bounding box] (-1.9,-2.9) rectangle (1.9,0.5);
+        \node[examplebox,draw=activationcolor,fill=activationcolor!8]
+          (input) at (0,0) {Input};
+        \node[examplebox,draw=conditioncolor,fill=conditioncolor!10]
+          (step) at (0,-1.15) {Transform};
+        \node[examplebox,draw=accent,fill=wash]
+          (output) at (0,-2.3) {Output};
+        \draw[flow] (input) -- (step);
+        \draw[flow] (step) -- (output);
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \centering
+      {\small\bfseries Decision\par}
+      \vspace{3mm}
+      \begin{tikzpicture}
+        \path[use as bounding box] (-1.9,-2.9) rectangle (1.9,0.5);
+        \node[diamond,aspect=2,draw=conditioncolor,fill=conditioncolor!10,
+          thick,inner sep=2mm,font=\small] (check) at (0,-0.2) {Check};
+        \node[examplebox,minimum width=16mm,draw=activationcolor,
+          fill=activationcolor!8] (left) at (-1,-2.3) {Path A};
+        \node[examplebox,minimum width=16mm,draw=accent,
+          fill=wash] (right) at (1,-2.3) {Path B};
+        \draw[flow,draw=activationcolor] (check.west) -| node[pos=0.7,left,
+          font=\scriptsize,text=ink] {Yes} (left.north);
+        \draw[flow,draw=accent] (check.east) -| node[pos=0.7,right,
+          font=\scriptsize,text=ink] {No} (right.north);
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \centering
+      {\small\bfseries Geometry\par}
+      \vspace{3mm}
+      \begin{tikzpicture}
+        \path[use as bounding box] (-0.5,-0.6) rectangle (3.3,2.8);
+        \draw[->,muted!50] (0,0) -- (3,0);
+        \draw[->,muted!50] (0,0) -- (0,2.5);
+        \draw[dashed,muted!50] (1.8,0.3) -- (2.4,1.9) -- (0.6,1.6);
+        \draw[vector,activationcolor] (0,0) -- (1.8,0.3)
+          node[pos=0.7,below,font=\small] {$\mathbf{x}$};
+        \draw[vector,accent] (0,0) -- (0.6,1.6)
+          node[pos=0.65,left,font=\small] {$\mathbf{v}$};
+        \draw[vector,conditioncolor] (0,0) -- (2.4,1.9)
+          node[above,font=\small] {$\mathbf{x}+\mathbf{v}$};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  \vspace{2mm}
+  \begin{block}{One idea per slide}
+    Clear labels, purposeful color, and room to breathe.
+  \end{block}
 \end{frame}
 
 % Add future slides above. Keep citations inline; no external .bib is needed.
