@@ -4,7 +4,8 @@ Collaborative slides for **Programming Refusal with Conditional Activation
 Steering** (Lee et al., ICLR 2025).
 
 - [`presentation.tex`](presentation.tex): the single presentation source, including
-  styling, diagrams, and references. Contains a title slide and one diagram/style example.
+  styling, diagrams, and references. Contains a title slide and one style example
+  with diagrams, a synthetic chart, and formulas.
 - [`presentation.pdf`](presentation.pdf): the compiled slides, committed after visual review.
 - [`paper.pdf`](paper.pdf): the official conference paper, including appendices.
 - [`AGENTS.md`](AGENTS.md): guidance for contributors and coding agents.
