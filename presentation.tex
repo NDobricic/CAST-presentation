@@ -1,0 +1,97 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% Keep the complete deck, including styling and diagrams, in this file.
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+
+\definecolor{ink}{HTML}{172B4D}
+\definecolor{accent}{HTML}{007F82}
+\definecolor{muted}{HTML}{5B6778}
+\definecolor{wash}{HTML}{EDF5F5}
+
+\setbeamercolor{normal text}{fg=ink,bg=white}
+\setbeamercolor{structure}{fg=accent}
+\setbeamercolor{frametitle}{fg=ink}
+\setbeamercolor{title}{fg=ink}
+\setbeamercolor{subtitle}{fg=accent}
+\setbeamercolor{block title}{fg=accent,bg=wash}
+\setbeamercolor{block body}{fg=ink,bg=wash}
+\setbeamerfont{title}{size=\LARGE,series=\bfseries}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamersize{text margin left=9mm,text margin right=9mm}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize item}{\small\textbullet}
+\setbeamertemplate{footline}{%
+  \hfill\textcolor{muted}{\scriptsize CAST\quad
+  \insertframenumber/\inserttotalframenumber}\hspace{9mm}\vspace{4mm}}
+
+\newcommand{\papersource}[1]{%
+  \par\vfill{\scriptsize\color{muted}Lee et al., ICLR 2025, #1.}}
+
+\title{Programming Refusal with\\Conditional Activation Steering}
+\subtitle{A collaborative paper presentation}
+\author{\texorpdfstring{Bruce W. Lee et al.\enspace\textbar\enspace ICLR 2025}{Bruce W. Lee et al. | ICLR 2025}}
+\date{Presentation draft}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \vspace{6mm}
+  {\small\color{accent}\bfseries PAPER PRESENTATION}\par
+  \vspace{6mm}
+  {\usebeamerfont{title}\inserttitle\par}
+  \vspace{5mm}
+  {\color{accent}\insertsubtitle\par}
+  \vspace{8mm}
+  {\small\insertauthor\par}
+  \vfill
+  {\scriptsize\color{muted}\insertdate\quad\textbar\quad
+  Source: official ICLR conference paper (paper.pdf)}
+\end{frame}
+
+\begin{frame}{Control when steering is applied}
+  Activation steering adds a behavior vector to a model's hidden state.
+  CAST adds a condition that decides when to apply it.
+
+  \vspace{7mm}
+  \begin{center}
+  \begin{tikzpicture}[
+    box/.style={draw=accent,fill=wash,rounded corners=3pt,
+      minimum height=13mm,text width=31mm,align=center,font=\small},
+    flow/.style={-{Latex[length=2mm]},thick,draw=accent},
+    node distance=10mm]
+    \node[box] (state) {Prompt\\activations};
+    \node[box,right=of state] (gate) {Condition check\\$g\in\{0,1\}$};
+    \node[box,right=of gate] (steer) {Apply behavior\\if $g=1$};
+    \draw[flow] (state) -- (gate);
+    \draw[flow] (gate) -- (steer);
+  \end{tikzpicture}
+  \end{center}
+  \vspace{3mm}
+  \[
+    h' = h + g\,\alpha\,v
+  \]
+  {\small $h$: hidden state\quad $v$: behavior vector\quad
+   $\alpha$: steering strength}
+  \papersource{Section 3.1; schematic notation}
+\end{frame}
+
+\begin{frame}{Build the story around three questions}
+  \begin{enumerate}
+    \setlength{\itemsep}{5mm}
+    \item \textbf{Why selective refusal?}\\
+      What changes when steering is conditional?
+    \item \textbf{How does CAST work?}\\
+      Explain condition vectors, behavior vectors, and the gate.
+    \item \textbf{What does the evidence establish?}\\
+      Present the paper's results, examples, and limitations.
+  \end{enumerate}
+  \vfill
+  {\small\color{muted}Draft roadmap: expand with cited figures and verified
+  results from the paper.}
+\end{frame}
+
+% Add future slides above. Keep citations inline; no external .bib is needed.
+\end{document}
