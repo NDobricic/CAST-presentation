@@ -21,9 +21,13 @@ Steering* (ICLR 2025). Use `paper.pdf` as the primary reference.
   "draft", "work in progress", completion notes, and editing instructions.
 - Cite paper claims and figures. Clearly distinguish the authors' findings from
   our observations, hypotheses, or reproduction results; do not invent results.
-- After every PDF build, always visually inspect every slide in a PDF viewer or
+- For interactive work, after every PDF build, visually inspect every slide in a PDF viewer or
   rendered page images. Check clipping, overlaps, legibility, spacing, equations,
   and visual consistency; fix issues and rebuild before considering work done.
+- The user authorized GitHub Actions to rebuild and commit the PDF on every push.
+  Automated builds may commit immediately after compiling and rendering all slides.
+  Publish the PDF and slide previews for contributors to visually review every
+  build; never claim that CI compilation or rendering performs visual inspection.
 - Follow `README.md` for building. Keep auxiliary files and previews in the
   ignored `build/` directory. After visual review, copy the built PDF to the
   tracked `presentation.pdf` and commit it with source changes. Retain the

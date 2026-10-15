@@ -6,7 +6,7 @@ Steering** (Lee et al., ICLR 2025).
 - [`presentation.tex`](presentation.tex): the single presentation source, including
   styling, diagrams, and references. Contains a title slide and one style example
   with diagrams, a synthetic chart, and formulas.
-- [`presentation.pdf`](presentation.pdf): the compiled slides, committed after visual review.
+- [`presentation.pdf`](presentation.pdf): the compiled slides, updated automatically on push.
 - [`paper.pdf`](paper.pdf): the official conference paper, including appendices.
 - [`AGENTS.md`](AGENTS.md): guidance for contributors and coding agents.
 
@@ -72,6 +72,31 @@ sudo apt install texlive-latex-recommended texlive-latex-extra texlive-pictures 
 
 Restart your terminal after installation if necessary, then check `pdflatex --version`.
 See the [LaTeX Project setup overview](https://www.latex-project.org/get/) for other systems.
+
+## Automatic builds on GitHub
+
+Every push to a branch runs [Build presentation PDF](.github/workflows/build-presentation.yml).
+The workflow installs LaTeX, compiles twice, renders every slide, and commits only
+`presentation.pdf` back to the same branch if its bytes changed. It also supports
+manual runs from the repository's Actions tab. No local LaTeX installation or
+personal access token is needed for this workflow.
+
+Open the [Actions tab](https://github.com/NDobricic/CAST-presentation/actions), select
+the run, and download **presentation-preview** for the PDF, PNG images of every
+slide, and the compilation log. Artifacts are retained for seven days.
+**Visually inspect every slide after each build**; a successful run does not
+verify visual quality. Automatic builds commit before this human review.
+
+The workflow uses the built-in `GITHUB_TOKEN` with `contents: write`; commits made
+with that token do not trigger another push workflow. If a branch advances during
+the build, the workflow skips its obsolete PDF and lets the newer push build it.
+It never force-pushes. Pull before your next local edit to receive the bot's commit.
+
+Repository or organization policies must permit workflow write access and the
+bot's direct push to the branch. If a branch requires pull requests, its protection
+can reject the automatic commit; the build artifact remains available.
+See [GitHub token permissions](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token)
+and [workflow-trigger behavior](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
 
 ## Build the slides
 
