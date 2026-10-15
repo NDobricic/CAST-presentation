@@ -5,6 +5,7 @@ Steering** (Lee et al., ICLR 2025).
 
 - [`presentation.tex`](presentation.tex): the single presentation source, including
   styling, diagrams, and references. Currently a three-slide starter, not a finished talk.
+- [`presentation.pdf`](presentation.pdf): the compiled slides, committed after visual review.
 - [`paper.pdf`](paper.pdf): the official conference paper, including appendices.
 - [`AGENTS.md`](AGENTS.md): guidance for contributors and coding agents.
 
@@ -64,8 +65,16 @@ pdftoppm -png -r 120 build/presentation.pdf build/slide
 Inspect every generated `build/slide-*.png`; a successful compiler exit alone
 does not establish that the slides look correct. Fix issues, rebuild, and inspect again.
 Keep the deck concise and add citations alongside paper claims and figures.
-Commit source changes and discuss them through GitHub pull requests. Generated
-slides, previews, and compilation files are ignored.
+After visual review, update the tracked PDF from the build output:
+
+```sh
+cp build/presentation.pdf presentation.pdf
+```
+
+In PowerShell, use `Copy-Item build/presentation.pdf presentation.pdf`.
+Commit `presentation.pdf` together with source changes and discuss them through
+GitHub pull requests. Build outputs, previews, and compilation files under
+`build/` remain ignored.
 
 Useful references: [Beamer documentation](https://ctan.org/pkg/beamer),
 [TikZ/PGF documentation](https://ctan.org/pkg/pgf), and the

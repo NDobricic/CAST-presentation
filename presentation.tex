@@ -10,6 +10,8 @@
 \definecolor{accent}{HTML}{007F82}
 \definecolor{muted}{HTML}{5B6778}
 \definecolor{wash}{HTML}{EDF5F5}
+\definecolor{activationcolor}{HTML}{345FAD}
+\definecolor{conditioncolor}{HTML}{9C6500}
 
 \setbeamercolor{normal text}{fg=ink,bg=white}
 \setbeamercolor{structure}{fg=accent}
@@ -31,9 +33,9 @@
   \par\vfill{\scriptsize\color{muted}Lee et al., ICLR 2025, #1.}}
 
 \title{Programming Refusal with\\Conditional Activation Steering}
-\subtitle{A collaborative paper presentation}
+\subtitle{Conditional control of model behavior}
 \author{Tia Manoukian, Nada Hammad, Nikola Dobričić}
-\date{Presentation draft}
+\date{}
 
 \begin{document}
 
@@ -49,8 +51,6 @@
   \vspace{3mm}
   {\scriptsize\color{muted}Paper by Bruce W. Lee et al.\enspace\textbar\enspace ICLR 2025\par}
   \vfill
-  {\scriptsize\color{muted}\insertdate\quad\textbar\quad
-  Source: official ICLR conference paper (paper.pdf)}
 \end{frame}
 
 \begin{frame}{Control when steering is applied}
@@ -64,8 +64,8 @@
       minimum height=13mm,text width=31mm,align=center,font=\small},
     flow/.style={-{Latex[length=2mm]},thick,draw=accent},
     node distance=10mm]
-    \node[box] (state) {Prompt\\activations};
-    \node[box,right=of state] (gate) {Condition check\\$g\in\{0,1\}$};
+    \node[box,draw=activationcolor,fill=activationcolor!8] (state) {Prompt\\activations};
+    \node[box,draw=conditioncolor,fill=conditioncolor!10,right=of state] (gate) {Condition check\\$g\in\{0,1\}$};
     \node[box,right=of gate] (steer) {Apply behavior\\if $g=1$};
     \draw[flow] (state) -- (gate);
     \draw[flow] (gate) -- (steer);
@@ -73,26 +73,26 @@
   \end{center}
   \vspace{3mm}
   \[
-    h' = h + g\,\alpha\,v
+    h' = \textcolor{activationcolor}{h}
+      + \textcolor{conditioncolor}{g}\,\alpha\,\textcolor{accent}{v}
   \]
-  {\small $h$: hidden state\quad $v$: behavior vector\quad
+  {\small \textcolor{activationcolor}{$h$}: hidden state\quad
+   \textcolor{accent}{$v$}: behavior vector\quad
    $\alpha$: steering strength}
   \papersource{Section 3.1; schematic notation}
 \end{frame}
 
-\begin{frame}{Build the story around three questions}
+\begin{frame}{Three questions about CAST}
   \begin{enumerate}
     \setlength{\itemsep}{5mm}
     \item \textbf{Why selective refusal?}\\
       What changes when steering is conditional?
     \item \textbf{How does CAST work?}\\
-      Explain condition vectors, behavior vectors, and the gate.
+      Condition vectors, behavior vectors, and the gate.
     \item \textbf{What does the evidence establish?}\\
-      Present the paper's results, examples, and limitations.
+      The paper's results, examples, and limitations.
   \end{enumerate}
   \vfill
-  {\small\color{muted}Draft roadmap: expand with cited figures and verified
-  results from the paper.}
 \end{frame}
 
 % Add future slides above. Keep citations inline; no external .bib is needed.
