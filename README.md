@@ -10,6 +10,46 @@ Steering** (Lee et al., ICLR 2025).
 - [`paper.pdf`](paper.pdf): the official conference paper, including appendices.
 - [`AGENTS.md`](AGENTS.md): guidance for contributors and coding agents.
 
+## Upload to Prism
+
+In [Prism](https://prism.openai.com/), choose **Import**, then **Import a .zip file**,
+and select `cast-presentation-prism.zip`. The archive places `presentation.tex`
+at its root as the only TeX source, alongside the reference `paper.pdf`,
+`AGENTS.md`, this README, and a compiled snapshot named `preview.pdf`.
+`preview.pdf` is for comparison; compile `presentation.tex` to produce the slides.
+If prompted for the main document, select `presentation.tex` and use pdfLaTeX.
+No local LaTeX installation is required for collaborators using Prism.
+
+Start the assistant with:
+
+> Read and follow the PRESENTATION EDITING GUIDELINES at the beginning of
+> presentation.tex before making changes. Keep those comments in the source.
+> After building, visually inspect every slide; if you cannot inspect the output,
+> explicitly ask a collaborator to review it.
+
+The editing rules are embedded as LaTeX comments because automatic `AGENTS.md`
+loading in Prism is not documented. The comments do not appear in the slides.
+Invite collaborators using their Prism accounts. Export the project when ready
+to bring source changes back to GitHub; the documented Prism workflow currently
+does not include Git synchronization.
+See [OpenAI's Prism import/export guide](https://help.openai.com/en/articles/20001050-troubleshooting-and-getting-help-in-prism).
+
+To regenerate the upload archive after building and visually reviewing the PDF,
+run this from the repository root (Python 3 is only needed for packaging):
+
+```sh
+python3 - <<'PY'
+from pathlib import Path
+from zipfile import ZipFile, ZIP_DEFLATED
+
+Path("build").mkdir(exist_ok=True)
+with ZipFile("build/cast-presentation-prism.zip", "w", ZIP_DEFLATED) as archive:
+    for name in ("presentation.tex", "paper.pdf", "AGENTS.md", "README.md"):
+        archive.write(name, name)
+    archive.write("presentation.pdf", "preview.pdf")
+PY
+```
+
 ## Set up LaTeX
 
 Install a TeX distribution with **pdfLaTeX**, **Beamer**, **PGF/TikZ**, and Latin

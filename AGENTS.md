@@ -7,6 +7,8 @@ Steering* (ICLR 2025). Use `paper.pdf` as the primary reference.
 
 - Keep all presentation source, styling, diagrams, and references in the single
   `presentation.tex` file. Avoid additional TeX files or a separate bibliography.
+- Keep the slide-editing guidance in the leading comments of `presentation.tex`
+  consistent with these rules so it travels with browser-editor imports.
 - Keep slides clean and concise: one main idea per slide, short text, readable
   type, and generous whitespace. Prefer useful diagrams to dense bullet lists.
 - Maintain a visually coherent layout, typography, spacing, and restrained color
