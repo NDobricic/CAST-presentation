@@ -9,6 +9,13 @@
 % Never show presentation-status labels (draft, work in progress) or editing notes.
 % Cite paper claims and figures; distinguish reported findings from our results.
 % Never present synthetic examples as measured evidence.
+% Keep experimental numbers exact and charts editable in TikZ.
+% Keep methodology, caveats, provenance, and timing in speaker notes (\note).
+% Distinguish condition-gate activation from judge-rated coherent refusal.
+% Never imply model judgments are human ground truth or test sweeps are optimal.
+% Keep build outputs and previews under build/; after visual review, copy the
+% built PDF to presentation.pdf and commit it together with source changes.
+% Retain the reference paper in Git. Use single-line commit messages.
 % After each build, visually inspect every rendered slide for clipping, overlaps,
 % legibility, equation layout, and consistency. Fix issues and rebuild/review.
 % If visual inspection is unavailable, explicitly ask a collaborator to review.
@@ -47,6 +54,30 @@
   \hfill\textcolor{muted}{\scriptsize CAST\quad
   \insertframenumber/\inserttotalframenumber}\hspace{9mm}\vspace{4mm}}
 
+% Define \presenternotes on the command line to export the embedded notes.
+\setbeameroption{hide notes}
+\ifdefined\presenternotes
+  \setbeameroption{show only notes}
+\fi
+\setbeamertemplate{note page}{%
+  \vspace{3mm}\noindent\begin{minipage}{\textwidth}\raggedright
+    {\color{accent}\scriptsize\bfseries PRESENTER NOTES\quad\insertframenumber}\par
+    \vspace{2mm}
+    {\color{ink}\normalsize\bfseries\insertframetitle}\par
+    \vspace{2mm}
+    {\color{ink}\footnotesize\insertnote}
+  \end{minipage}}
+
+\newcommand{\stage}[1]{{\scriptsize\color{accent}\bfseries
+  OUR EXPERIMENTS\enspace/\enspace#1}\par\vspace{3mm}}
+\newcommand{\oursource}[1]{\par\vfill{\scriptsize\color{muted}
+  Our controlled ablations\enspace\textbar\enspace#1\par}}
+\tikzset{
+  flow/.style={-{Latex[length=2.4mm]},thick,draw=muted!65},
+  panel/.style={rounded corners=3pt,inner sep=0pt},
+  chartlabel/.style={font=\scriptsize,text=muted},
+  bigvalue/.style={font=\fontsize{32}{35}\selectfont\bfseries}}
+
 \newcommand{\papersource}[1]{%
   \par\vfill{\scriptsize\color{muted}Lee et al., ICLR 2025, #1.}}
 
@@ -69,106 +100,369 @@
   \vspace{3mm}
   {\scriptsize\color{muted}Paper by Bruce W. Lee et al.\enspace\textbar\enspace ICLR 2025\par}
   \vfill
+  \note{Opening title for the full presentation. The experimental section that
+  follows takes approximately 6 minutes 30 seconds, excluding the backup slide.
+  These are our independent controlled ablations, not the paper's reported
+  results or a claim of full reproduction.}
 \end{frame}
 
-% A style example only: these diagrams make no claims about paper results.
-\begin{frame}{Example slide: visual style guide}
-  \tikzset{
-    examplebox/.style={rounded corners=3pt,thick,minimum height=8mm,
-      minimum width=22mm,align=center,font=\small},
-    flow/.style={-{Latex[length=2mm]},thick,draw=muted},
-    vector/.style={-{Latex[length=2mm]},very thick}}
 
-  \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.31\textwidth}
-      \centering
-      {\small\bfseries Process\par}
-      \vspace{3mm}
-      \begin{tikzpicture}
-        \path[use as bounding box] (-1.9,-2.9) rectangle (1.9,0.5);
-        \node[examplebox,draw=activationcolor,fill=activationcolor!8]
-          (input) at (0,0) {Input};
-        \node[examplebox,draw=conditioncolor,fill=conditioncolor!10]
-          (step) at (0,-1.15) {Transform};
-        \node[examplebox,draw=accent,fill=wash]
-          (output) at (0,-2.3) {Output};
-        \draw[flow] (input) -- (step);
-        \draw[flow] (step) -- (output);
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.31\textwidth}
-      \centering
-      {\small\bfseries Decision\par}
-      \vspace{3mm}
-      \begin{tikzpicture}
-        \path[use as bounding box] (-1.9,-2.9) rectangle (1.9,0.5);
-        \node[diamond,aspect=2,draw=conditioncolor,fill=conditioncolor!10,
-          thick,inner sep=2mm,font=\small] (check) at (0,-0.2) {Check};
-        \node[examplebox,minimum width=16mm,draw=activationcolor,
-          fill=activationcolor!8] (left) at (-1,-2.3) {Path A};
-        \node[examplebox,minimum width=16mm,draw=accent,
-          fill=wash] (right) at (1,-2.3) {Path B};
-        \draw[flow,draw=activationcolor] (check.west)
-          -- node[above,font=\scriptsize,text=ink] {Yes} (-2.05,-0.2)
-          |- (left.west);
-        \draw[flow,draw=accent] (check.east)
-          -- node[above,font=\scriptsize,text=ink] {No} (2.05,-0.2)
-          |- (right.east);
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.31\textwidth}
-      \centering
-      {\small\bfseries Geometry\par}
-      \vspace{3mm}
-      \begin{tikzpicture}
-        \path[use as bounding box] (-0.5,-0.6) rectangle (3.3,2.8);
-        \draw[->,muted!50] (0,0) -- (3,0);
-        \draw[->,muted!50] (0,0) -- (0,2.5);
-        \draw[dashed,muted!50] (1.8,0.3) -- (2.4,1.9) -- (0.6,1.6);
-        \draw[vector,activationcolor] (0,0) -- (1.8,0.3)
-          node[pos=0.7,below,font=\small] {$\mathbf{x}$};
-        \draw[vector,accent] (0,0) -- (0.6,1.6)
-          node[pos=0.65,left,font=\small] {$\mathbf{v}$};
-        \draw[vector,conditioncolor] (0,0) -- (2.4,1.9)
-          node[above,font=\small] {$\mathbf{x}+\mathbf{v}$};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+% EXPERIMENTAL SECTION: six main slides, approximately 6 minutes 30 seconds.
+% Numerical source of truth: parent project's notes/ablation-experiments-overview.md
+% (completed 2026-10-16). All charts below are editable TikZ, with measured values.
+
+% 1 / 6 -- 45 seconds.
+\begin{frame}{Does finding a direction mean we can control behavior?}
+  \stage{THE QUESTION}
   \vspace{5mm}
-  \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.42\textwidth}
-      \centering
-      {\small\bfseries Chart\enspace{\normalfont\color{muted}(synthetic values)}\par}
-      \vspace{1mm}
-      \begin{tikzpicture}[x=1cm,y=1.15cm,font=\scriptsize]
-        \draw[muted!20] (0,0.5) -- (3,0.5);
-        \draw[muted!20] (0,1) -- (3,1);
-        \node[left,text=muted] at (0,0) {0};
-        \node[left,text=muted] at (0,1) {1};
-        \fill[activationcolor!80] (0.4,0) rectangle (0.9,0.35);
-        \fill[conditioncolor!80] (1.35,0) rectangle (1.85,0.65);
-        \fill[accent!80] (2.3,0) rectangle (2.8,0.9);
-        \draw[muted!60] (0,1.1) -- (0,0) -- (3,0);
-        \node[below] at (0.65,0) {A};
-        \node[below] at (1.6,0) {B};
-        \node[below] at (2.55,0) {C};
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.54\textwidth}
-      \centering
-      {\small\bfseries Example formulas\par}
-      \vspace{2mm}
-      {\small
-      $\displaystyle \mathbf{z}
-        = \textcolor{activationcolor}{\mathbf{x}}
-        + \alpha\,\textcolor{accent}{\mathbf{v}}$\par
-      \vspace{3mm}
-      $\displaystyle \cos\theta
-        = \frac{\mathbf{x}^{\mathsf T}\mathbf{v}}
-          {\lVert\mathbf{x}\rVert\,\lVert\mathbf{v}\rVert}$\par}
-    \end{column}
-  \end{columns}
+  \centering
+  \begin{tikzpicture}[x=1cm,y=1cm]
+    \path[use as bounding box] (0,-1.2) rectangle (14,2.6);
+    \foreach \x/\col/\title/\question in {
+      2.15/activationcolor/Representation/{Can we detect\\the concept?},
+      7/conditioncolor/Robustness/{Does detection survive\\context changes?},
+      11.85/accent/Control/{Can we change\\model behavior?}} {
+      \node[panel,fill=\col!9,minimum width=42mm,minimum height=15mm,
+        font=\large\bfseries,text=\col] at (\x,1.6) {\title};
+      \node[align=center,font=\normalsize,text=ink] at (\x,0.1) {\question};
+    }
+    \draw[flow] (4.4,1.6) -- (4.73,1.6);
+    \draw[flow] (9.25,1.6) -- (9.58,1.6);
+  \end{tikzpicture}
+  \papersource{\S3: condition detection and behavior steering. Our analysis separates the steps}
+  \note{Timing: 45 seconds.
+
+  CAST extracts directions from hidden-state space. A condition direction detects
+  when a gate should activate; a separate behavior vector then steers generation.
+  This modular design is described in Lee et al., ICLR 2025, Section 3.
+
+  Our question is whether success at one step guarantees success at the others.
+  Finding predictive information, retaining detection under context changes, and
+  causally inducing useful behavior are separate empirical questions.
+
+  We completed six ablation experiments and controls across Qwen1.5-1.8B,
+  Qwen3-8B, OLMo2-7B and Granite3.3-8B. This section highlights the strongest
+  findings rather than cataloguing all six experiments. The newer studies are
+  controlled ablations, not exact replications of the paper.}
 \end{frame}
 
-% Add future slides above. Keep citations inline; no external .bib is needed.
+% 2 / 6 -- 60 seconds.
+\begin{frame}{The information is there --- but CAST doesn't extract all of it}
+  \stage{REPRESENTATION}
+  \centering
+  \begin{tikzpicture}[x=1cm,y=3.45cm]
+    \path[use as bounding box] (-0.65,-0.22) rectangle (13.5,1.23);
+    \node[anchor=west,font=\scriptsize,text=muted] at (-0.45,1.17) {Condition-classification F1};
+    \fill[conditioncolor] (6.75,1.15) rectangle (7.03,1.21);
+    \node[anchor=west,font=\scriptsize] at (7.13,1.18) {CAST detector};
+    \fill[activationcolor] (10.1,1.15) rectangle (10.38,1.21);
+    \node[anchor=west,font=\scriptsize] at (10.48,1.18) {Linear probe};
+    \foreach \y in {0,0.25,0.5,0.75,1} {
+      \draw[muted!17] (0,\y) -- (13.1,\y);
+      \node[left,font=\scriptsize,text=muted] at (0,\y) {\pgfmathprintnumber{\y}};
+    }
+    \foreach \x/\cast/\probe/\model in {
+      1.7/0.782/0.985/Qwen1.5-1.8B,
+      4.95/0.824/0.989/Qwen3-8B,
+      8.2/0.882/0.989/OLMo2-7B,
+      11.45/0.759/0.969/Granite3.3-8B} {
+      \fill[conditioncolor] (\x-0.85,0) rectangle (\x-0.1,\cast);
+      \fill[activationcolor] (\x+0.1,0) rectangle (\x+0.85,\probe);
+      \node[above,font=\scriptsize\bfseries,text=conditioncolor] at (\x-0.475,\cast) {\cast};
+      \node[above,font=\scriptsize\bfseries,text=activationcolor] at (\x+0.475,\probe) {\probe};
+      \node[below=3mm,font=\scriptsize] at (\x,0) {\model};
+    }
+    \draw[muted!55] (0,1) -- (0,0) -- (13.1,0);
+  \end{tikzpicture}
+  \oursource{Exp.\ 5\quad Held-out F1\enspace$\cdot$\enspace Same hidden-state features}
+  \note{Timing: 60 seconds. Source: completed experiment overview, Experiment 5.
+
+  The bars compare pairwise-PCA CAST with standardized logistic regression on
+  the same cached hidden-state features. Each method selects its layer within
+  blocks 6--10 on validation; this does not require the chosen layer to coincide.
+  Probe regularization and detector thresholds are also validation-selected.
+  The test contains 90 harmful and 140 benign prompts. Values are arithmetic
+  means across seeds 17, 29 and 43, with the same test prompts repeated.
+
+  PCA summarizes directions of maximum variance; logistic regression explicitly
+  optimizes a labeled decision boundary. A supervised advantage is expected,
+  but the size of the improvement is noteworthy in all four models.
+
+  Near-perfect F1 establishes strong within-dataset label classification, not
+  semantic understanding of harmfulness. Harmful and benign examples come from
+  different dataset sources, so style or source cues could suffice. Family
+  splits remove normalized literal overlap but cannot exclude semantic overlap
+  or historical test exposure. Probe robustness and probe-triggered generation
+  were not evaluated; these results establish neither out-of-distribution
+  generalization nor successful behavioral control.}
+\end{frame}
+
+% 3 / 6 -- 90 seconds: the main robustness observation.
+\begin{frame}{A harmless change in context can break the detector}
+  \stage{ROBUSTNESS}
+  \centering
+  {\small Original request\enspace$\longrightarrow$\enspace
+    Original request + irrelevant benign text\par}
+  \vspace{3mm}
+  \begin{tikzpicture}[x=1cm,y=1cm]
+    \path[use as bounding box] (0,-0.15) rectangle (14,3.7);
+    \fill[panel,activationcolor!6] (0.05,0) rectangle (6.8,3.55);
+    \fill[panel,conditioncolor!7] (7.2,0) rectangle (13.95,3.55);
+    \node[font=\normalsize\bfseries,text=activationcolor] at (3.42,3.12) {Qwen1.5-1.8B};
+    \node[font=\normalsize\bfseries,text=conditioncolor] at (10.58,3.12) {Qwen3-8B};
+    \node[font=\small] at (3.42,2.64) {Harmful prompts};
+    \node[font=\small] at (10.58,2.64) {Benign prompts};
+    \node[font=\fontsize{25}{28}\selectfont\bfseries] at (1.85,1.67) {64.6\%};
+    \node[bigvalue,text=conditioncolor] at (5.15,1.04) {0\%};
+    \draw[-{Latex[length=3mm]},line width=1.5pt,conditioncolor]
+      (3.1,1.85) -- (3.95,0.96);
+    \node[font=\fontsize{25}{28}\selectfont\bfseries] at (8.85,1.04) {25\%};
+    \node[bigvalue,text=conditioncolor] at (12.15,1.67) {100\%};
+    \draw[-{Latex[length=3mm]},line width=1.5pt,conditioncolor]
+      (10.1,0.96) -- (10.95,1.85);
+    \foreach \x in {1.85,8.85}
+      \node[font=\scriptsize,text=muted] at (\x,0.35) {Original};
+    \foreach \x in {5.15,12.15}
+      \node[font=\scriptsize,text=muted] at (\x,0.35) {+ long context};
+  \end{tikzpicture}
+  \vspace{1mm}
+  {\normalsize\bfseries Opposite failures. Same loss of selectivity.\par}
+  \oursource{Exp.\ 4\quad Gate activation\enspace$\cdot$\enspace16 families per class\enspace$\cdot$\enspace3-seed means}
+  \note{Timing: 90 seconds. Source: completed overview, Experiment 4, long-context rows.
+
+  These percentages measure condition-gate activation, not refusal. The same
+  request is retained and long irrelevant benign context is added. Its frozen
+  harmful or benign label does not change. No vectors, thresholds or layers are
+  recalibrated on the transformed prompts.
+
+  For Qwen1.5, harmful-prompt gate activation collapses from 64.6\% to 0\%.
+  For Qwen3, benign-prompt activation increases from 25\% to 100\%. In the
+  full long-context panel, the smaller model's gate becomes all-off and
+  Qwen3's all-on across both classes: opposite failures of selectivity.
+
+  The robustness panel has 16 harmful and 16 benign prompt families per model,
+  repeated across three seeds. These are seed means on a fixed small panel,
+  not universal failure rates or 96 independent prompt families. Other tested
+  transformations include paraphrases, formatting and benign sensitive-term
+  decoys; we highlight long context here.
+
+  One possible explanation is mean pooling of token activations: added tokens
+  can shift the aggregate hidden representation and similarity score. This is
+  a hypothesis, not an established causal mechanism. Gate decisions and final
+  refusal remain distinct, since the base model can refuse while the gate is
+  off. This observation matters because CAST aims at context-dependent control.}
+\end{frame}
+
+% 4 / 6 -- 90 seconds: separate detection from intervention.
+\begin{frame}{Detecting a condition is not the same as steering behavior}
+  \stage{CONTROL}
+  \centering
+  \begin{tikzpicture}[x=1cm,y=1cm]
+    \path[use as bounding box] (0,-0.1) rectangle (14,4.75);
+    \foreach \x/\model/\detect/\refuse/\col in {
+      3.45/Qwen1.5-1.8B/68.5/95.6/accent,
+      10.55/OLMo2-7B/82.2/6.5/conditioncolor} {
+      \node[font=\normalsize\bfseries] at (\x,4.45) {\model};
+      \node[panel,fill=activationcolor!7,minimum width=63mm,minimum height=12mm]
+        at (\x,3.38) {};
+      \node[font=\large\bfseries,text=activationcolor] at (\x,3.59) {\detect\%};
+      \node[font=\small] at (\x,3.10) {Harmful prompts detected};
+      \draw[flow] (\x,2.72) -- (\x,2.22);
+      \node[panel,fill=\col!9,minimum width=63mm,minimum height=19mm]
+        at (\x,1.17) {};
+      \node[bigvalue,text=\col] at (\x,1.48) {\refuse\%};
+      \node[font=\small] at (\x,0.70) {Coherent refusal when triggered};
+    }
+  \end{tikzpicture}
+  \oursource{Exp.\ 3\quad Coherent refusal: model-judge ratings on valid gated harmful responses}
+  \note{Timing: 90 seconds. Source: completed overview, Experiment 3.
+
+  CAST has two components: condition detection decides when to intervene;
+  behavior steering changes generation after the gate activates. The upper
+  percentages are gate recall over the 90 harmful test prompts, averaged across
+  seeds. The lower percentages are judged coherent decline among harmful
+  responses whose gate activated, using valid judgments only and then averaging
+  per-seed rates. They have different denominators; do not multiply them to
+  infer the overall refusal rate.
+
+  Qwen1.5 misses many harmful prompts, but its intervention usually produces a
+  coherent refusal when triggered. OLMo2 detects more harmful prompts, yet only
+  6.5\% of valid gated harmful responses receive a coherent-decline rating.
+  Its intervention often disrupts generation. Probing reads predictive
+  information; steering is a causal manipulation and must be tested separately.
+
+  Both models use the same fixed absolute intervention blocks 10--20 and
+  strength 4. The architecture and activation scales differ, and the newer
+  refusal-vector extraction uses a smaller batch. This is poor transfer of a
+  fixed configuration, not proof that CAST cannot work on OLMo2.
+
+  Coherent decline requires refusal plus whole-response coherence, as judged
+  by Qwen2.5-7B; unknowns are excluded. These are not human ground truth.
+  Known judge errors and the 50-token generation cap limit interpretation.}
+\end{frame}
+
+% 5 / 6 -- 60 seconds. Numeric alpha axis, not equally spaced categories.
+\begin{frame}{More steering is not necessarily better}
+  \stage{CONTROL / STRENGTH}
+  \centering
+  \begin{tikzpicture}[x=1.25cm,y=0.033cm]
+    \path[use as bounding box] (-0.8,-25) rectangle (10.5,130);
+    \node[anchor=west,font=\scriptsize,text=muted] at (-0.5,125)
+      {Qwen3-8B\enspace$\cdot$\enspace Unconditional refusal steering};
+    \node[anchor=west,font=\scriptsize,text=muted] at (-0.5,113)
+      {Judge-rated coherent refusal (\%)};
+    \fill[conditioncolor!8] (2,0) rectangle (4,100);
+    \foreach \y in {0,25,50,75,100} {
+      \draw[muted!17] (0,\y) -- (8,\y);
+      \node[left,font=\scriptsize,text=muted] at (0,\y) {\y};
+    }
+    \draw[muted!55] (0,100) -- (0,0) -- (8,0);
+    \foreach \x in {0,1,2,4,8} {
+      \draw[muted!55] (\x,0) -- (\x,-2);
+      \node[below=2mm,font=\scriptsize] at (\x,0) {\x};
+    }
+    \node[font=\scriptsize,text=muted] at (4,-21) {Steering strength $\alpha$};
+    \draw[activationcolor,line width=1.4pt]
+      (0,73.3) -- (1,87.5) -- (2,100) -- (4,100) -- (8,100);
+    \draw[conditioncolor,line width=1.4pt,dashed]
+      (0,0) -- (1,0) -- (2,0) -- (4,73.3) -- (8,87.5);
+    \foreach \x/\y in {0/73.3,1/87.5,2/100,4/100,8/100} {
+      \fill[activationcolor] (\x,\y) circle[x radius=0.055,y radius=2.1];
+    }
+    \foreach \x/\y in {0/0,1/0,2/0,4/73.3,8/87.5} {
+      \fill[conditioncolor] (\x-0.05,\y-1.9) rectangle (\x+0.05,\y+1.9);
+    }
+    \node[above right,font=\scriptsize,text=activationcolor] at (0,73.3) {73.3};
+    \node[above left,font=\scriptsize,text=activationcolor] at (1,87.5) {87.5};
+    \node[above,font=\scriptsize,text=activationcolor] at (2,100) {100.0};
+    \node[above,font=\scriptsize,text=activationcolor] at (4,100) {100.0};
+    \node[above,font=\scriptsize,text=activationcolor] at (8,100) {100.0};
+    \foreach \x in {0,1,2}
+      \node[above=2mm,font=\scriptsize,text=conditioncolor] at (\x,0) {0.0};
+    \node[below right,font=\scriptsize,text=conditioncolor] at (4,73.3) {73.3};
+    \node[below right,font=\scriptsize,text=conditioncolor] at (8,87.5) {87.5};
+    \node[anchor=west,font=\small\bfseries,text=activationcolor] at (8.3,101) {Harmful};
+    \node[anchor=west,font=\small\bfseries,text=conditioncolor] at (8.3,86) {Benign};
+    \node[align=center,font=\small\bfseries,text=conditioncolor] at (5.4,37)
+      {Higher strength\\$\longrightarrow$ reduced selectivity};
+    \draw[-{Latex[length=1.8mm]},conditioncolor] (3.5,35) -- (3,38);
+  \end{tikzpicture}
+  \oursource{Strength controls\quad16 families per class\enspace$\cdot$\enspace3-seed means\enspace$\cdot$\enspace Valid judgments only}
+  \note{Timing: 60 seconds. Source: completed overview, strength/random controls, Qwen3.
+
+  This is unconditional behavior steering, separate from CAST's gate. It
+  isolates the effect of intervention strength on a fixed panel of 16 harmful
+  and 16 benign families, repeated over three seeds. The x-axis uses numeric
+  alpha spacing. Lines join only the tested strengths, not measured intermediate
+  settings. Values are means of valid-only per-seed coherent-decline ratings.
+
+  At alpha 2, all harmful prompts received judged coherent refusals, while
+  benign coherent refusal was 0\% among valid ratings. At alpha 4, harmful
+  refusal remained 100\%, but benign refusal rose to 73.3\%. More intervention
+  can therefore reduce useful selectivity. The behavior is nonlinear and
+  model-dependent; alpha 2 is not a globally optimal or independently
+  validated setting. The sweep is descriptive and every prespecified strength
+  remains reported; we did not choose a replacement operating point on test.
+
+  Qwen3 valid/missing harmful rows for alpha 0,1,2,4,8 are 45/3,48/0,48/0,
+  46/2,48/0; benign rows are 42/6,45/3,42/6,45/3,48/0. Repeated responses
+  across seeds are not independent benchmark samples. Model judgments are not
+  human ground truth. Higher strengths also caused severe output degeneration
+  on OLMo2 and Granite, underscoring the need for intervention calibration.}
+\end{frame}
+
+% 6 / 6 -- 45 seconds. Echo the opening roles and colors.
+\begin{frame}{Three different problems --- not one}
+  \stage{THE LESSON}
+  \centering
+  \begin{tikzpicture}[x=1cm,y=1cm]
+    \path[use as bounding box] (0,0) rectangle (14,3.95);
+    \foreach \y/\num/\col/\title/\caption in {
+      3.35/1/activationcolor/{Information in activations}/{Linear probes classify the labels well.},
+      2.05/2/conditioncolor/{Robust concept detection}/{Context changes can break the gate.},
+      0.75/3/accent/{Reliable behavioral control}/{Steering depends on strength and model.}} {
+      \node[panel,fill=\col!8,minimum width=113mm,minimum height=10mm]
+        at (7,\y) {};
+      \node[circle,fill=\col,text=white,minimum size=7mm,font=\small\bfseries]
+        at (1.83,\y) {\num};
+      \node[anchor=west,font=\normalsize\bfseries,text=\col] at (2.5,\y+0.18) {\title};
+      \node[anchor=west,font=\small] at (2.5,\y-0.21) {\caption};
+    }
+    \draw[flow] (7,2.79) -- (7,2.61);
+    \draw[flow] (7,1.49) -- (7,1.31);
+  \end{tikzpicture}
+  \vspace{1mm}
+  {\large\bfseries A decodable representation is not necessarily\\
+    a robust detector or an effective intervention.\par}
+  \oursource{Synthesis of our controlled ablations\quad Experiments 3--5 and strength controls}
+  \note{Timing: 45 seconds. Close the experimental section at about 6 minutes 30 seconds.
+
+  The three questions from the opening now have distinct empirical answers.
+  First, hidden states contain highly predictive information for these dataset
+  labels. Second, detecting a concept robustly across contexts requires more
+  than high within-dataset classification F1. Our context transformations break
+  the tested CAST gate's selectivity. This does not show that every detector,
+  or the logistic probe specifically, fails the same transformations.
+
+  Third, reliable behavioral control is a further causal intervention problem:
+  behavior vectors depend on architecture, scale and strength. A good gate
+  cannot repair a behavior intervention that degenerates generation.
+
+  CAST is an elegant modular approach. Our findings suggest evaluating each
+  component independently, including condition detection, context robustness,
+  and coherent behavior after triggering. This lesson applies more broadly
+  to representation engineering and activation steering. It does not establish
+  that CAST is universally ineffective, that dataset labels capture semantic
+  harmfulness, or that the tested hyperparameters are optimal.}
+\end{frame}
+
+% Optional backup: excluded from the main six-slide narrative and timing.
+\appendix
+\section*{Backup}
+\begin{frame}{Does CAST need its nonlinear similarity function?}
+  \stage{BACKUP / DETECTOR GEOMETRY}
+  \centering
+  \begin{tikzpicture}[x=1cm,y=1cm]
+    \path[use as bounding box] (0,0) rectangle (14,4.6);
+    \node[font=\normalsize\bfseries,text=conditioncolor] at (3.5,4.16) {CAST similarity};
+    \node[font=\normalsize\bfseries,text=activationcolor] at (10.5,4.16) {Direct cosine};
+    \node[font=\Large] at (3.5,3.15)
+      {$\cos\!\bigl(h,\tanh(\operatorname{proj}_{c}h)\bigr)$};
+    \node[font=\Large] at (10.5,3.15) {$\cos(h,c)$};
+    \draw[muted!20] (7,1.05) -- (7,4.4);
+    \node[bigvalue,text=conditioncolor] at (3.5,1.72) {0.619};
+    \node[bigvalue,text=activationcolor] at (10.5,1.72) {0.736};
+    \foreach \x in {3.5,10.5}
+      \node[font=\small,text=muted] at (\x,0.96) {Held-out F1};
+    \node[font=\small] at (7,0.17)
+      {Qwen1.5-1.8B\quad$\cdot$\quad Float64 evaluation\quad$\cdot$\quad Fixed condition layer};
+  \end{tikzpicture}
+  \oursource{Exp.\ 1\quad Similarity formula: Lee et al., ICLR 2025, \S3.1}
+  \note{Optional backup, approximately 60 seconds; excluded from the main timing.
+  Source: completed overview, Experiment 1; formula: Lee et al., Section 3.1.
+
+  We fix pairwise-PCA condition vectors and block 8, then validation-select a
+  threshold and comparator direction separately for each similarity score.
+  These are float64 evaluations of cached features, not float64 model inference.
+  Qwen1.5 F1 is 0.619 for CAST versus 0.736 for direct cosine. Direct cosine
+  outperforms CAST's transformed similarity in all four tested float64 model
+  evaluations. These values differ from the main probe comparison, which
+  selects layers on validation and uses runtime arithmetic.
+
+  For nonzero projections,
+  \[
+    \cos\bigl(h,\operatorname{proj}_{c}h\bigr)=|\cos(h,c)|.
+  \]
+  Projection alone adds no new similarity information and discards sign;
+  the nonlinear tanh transformation changes the score. Our evidence shows that
+  this nonlinearity is not necessary for competitive separation on the fixed
+  layer and dataset, not that it never helps.
+
+  Precision matters: FP16 dot/norm reductions overflowed to inf/inf in an
+  initial modern-Qwen projection control. That failed run is preserved. Only
+  projection-cosine reductions were promoted to FP32 for all modern models;
+  CAST scores, runtime gates and model weights were unchanged. The float64
+  control separates this arithmetic sensitivity from detector geometry.}
+\end{frame}
+
 \end{document}
