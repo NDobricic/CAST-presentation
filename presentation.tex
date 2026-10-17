@@ -634,68 +634,6 @@
       the paper.}
 \end{frame}
 
-\begin{frame}{Representation: two detectors, same activations}
-  \centering
-  {\large\color{muted}Task: label each held-out prompt as harmful or
-    benign\par}
-  \vspace{5mm}
-  \begin{tikzpicture}[
-      prompt/.style={rounded corners=3pt,thick,text width=36mm,inner sep=2mm,
-        align=left,font=\small,execute at begin node={\hyphenpenalty=10000}},
-      det/.style={rounded corners=4pt,very thick,text width=42mm,
-        inner sep=2.5mm,align=center,minimum height=17mm},
-      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
-    \node[prompt,draw=conditioncolor,fill=conditioncolor!10] (p1) at (0,0.88)
-      {{\color{conditioncolor}\bfseries Harmful}\enspace``Give me 8 insulting
-      comments under his posts\,\ldots''};
-    \node[prompt,draw=muted] (p2) at (0,-0.88)
-      {{\color{muted}\bfseries Benign}\enspace``Summarize the importance of
-      the US Constitution.''};
-    \node[circle,thick,draw=activationcolor,fill=activationcolor!12,
-      minimum size=14mm,font=\Large] (h) at (3.6,0) {$\bar{\mathbf{h}}$};
-    \node[font=\small,text=muted,below=1mm of h,align=center]
-      {pooled prompt\\activations};
-    \node[det,draw=conditioncolor,fill=conditioncolor!10] (c) at (7.65,1.15)
-      {{\large\bfseries\color{conditioncolor}CAST detector}\\[1mm]
-      $\mathrm{sim}(\bar{\mathbf{h}},\mathrm{proj}_{\mathbf{c}}\bar{\mathbf{h}})
-      > \theta$\\[0.5mm]
-      {\small\color{muted}$\mathbf{c}$: first PCA direction}};
-    \node[det,draw=activationcolor,fill=activationcolor!12] (l) at (7.65,-1.15)
-      {{\large\bfseries\color{activationcolor}Linear probe}\\[1mm]
-      $\mathbf{w}^{\top}\bar{\mathbf{h}} + b > \tau$\\[0.5mm]
-      {\small\color{muted}$\mathbf{w}, b$: logistic regression}};
-    \node[font=\Large] (y) at (11.15,0) {harmful?};
-    \draw[flow] (p1.east) -- (h);
-    \draw[flow] (p2.east) -- (h);
-    \draw[flow] (h) -- (c.west);
-    \draw[flow] (h) -- (l.west);
-    \draw[flow] (c.east) -- (y);
-    \draw[flow] (l.east) -- (y);
-  \end{tikzpicture}\par
-  \vspace{6mm}
-  {\large Same features, labels and splits: only the read-out differs.\par}
-  \raggedright
-  \oursource{layer, thresholds $\theta,\tau$ and probe regularization
-    chosen on validation only}
-  \note[item]{About 40 s.}
-  \note[item]{First question: is the harmful/benign information present in
-      the activations, and how much of it does CAST's detector use?}
-  \note[item]{Both detectors get exactly the same input: the mean-pooled
-      prompt activations from one of layers 6--10, from the same train,
-      validation and test families.}
-  \note[item]{CAST: the condition vector is the first principal component of
-      the paired activations; the gate compares a similarity score to a
-      threshold.}
-  \note[item]{Probe: a logistic regression (scikit-learn, L2-regularized,
-      features standardized) trained directly on the labels, on the same
-      balanced harmful/benign training pairs. It is a linear probe: a
-      learned weight vector plus a threshold. As with CAST, its decision
-      threshold $\tau$ is chosen on validation, not fixed at 0.}
-  \note[item]{Layer, thresholds and the regularization strength $C$ (from
-      0.01, 0.1, 1, 10) are chosen on validation data only; the test prompts
-      are touched once.}
-\end{frame}
-
 \begin{frame}{Representation: probe vs.\ CAST detector}
   \centering
   {\large\color{muted}Held-out F1\enspace$\cdot$\enspace Same
@@ -726,9 +664,18 @@
     all of it.\par}
   \raggedright
   \oursource{3 seeds; 90 harmful + 140 benign test prompts}
-  \note[item]{About 45 s.}
-  \note[item]{Held-out F1 for the two detectors from the previous slide. The
-      CAST detector here uses the pairwise-PCA condition vector.}
+  \note[item]{About 60 s.}
+  \note[item]{First question: is the harmful/benign information present in
+      the activations, and how much of it does CAST's detector use?}
+  \note[item]{Both detectors read the same mean-pooled prompt activations
+      from one of layers 6--10, with the same train, validation and test
+      families. CAST detector: pairwise-PCA condition vector, similarity
+      compared to a threshold. Probe: logistic regression on standardized
+      features, trained on the labels.}
+  \note[item]{For both, the layer and decision threshold (and the probe's
+      regularization) are chosen on validation only; the chart shows
+      held-out test F1. Validation F1 is slightly higher, as expected from
+      tuning, so we report test.}
   \note[item]{PCA finds the direction of maximum variance; it never sees the
       decision boundary. Logistic regression directly optimizes a boundary
       on the labels. So the probe winning is expected; the size of the gap
