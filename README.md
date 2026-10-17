@@ -4,8 +4,8 @@ Collaborative slides for **Programming Refusal with Conditional Activation
 Steering** (Lee et al., ICLR 2025).
 
 - [`presentation.tex`](presentation.tex): the single presentation source, including
-  styling, diagrams, and references. Contains a title slide, one style example,
-  six slides on our experiments with speaker notes, and one backup slide.
+  styling, diagrams, and references. Contains a title slide and one style example
+  with diagrams, a synthetic chart, and formulas.
 - [`presentation.pdf`](presentation.pdf): the compiled slides, updated automatically on push.
 - [`paper.pdf`](paper.pdf): the official conference paper, including appendices.
 - [`AGENTS.md`](AGENTS.md): guidance for contributors and coding agents.
@@ -117,16 +117,6 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build presentation.
 
 On Windows, create `build` in your file manager or with `mkdir build` first,
 then run the same pdfLaTeX commands in PowerShell.
-
-Speaker notes live in `\note{...}` blocks and are hidden in the slides. To build
-a separate notes PDF, `build/presentation-notes.pdf`, run twice:
-
-```sh
-pdflatex -interaction=nonstopmode -halt-on-error -output-directory=build -jobname=presentation-notes '\def\presenternotes{1}\input{presentation.tex}'
-```
-
-In Prism or Overleaf, change `hide notes` to `show only notes` near the top of
-`presentation.tex` instead.
 
 ## Review and collaborate
 
