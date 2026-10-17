@@ -491,111 +491,101 @@
     Sorry-Bench: Xie et al., 2024b}
 \end{frame}
 
-\begin{frame}{Vector extraction: token pooling}
+\begin{frame}{Vector extraction: where tokens are pooled}
   \centering
-  {\large\color{muted}Per example and layer
-    $\ell$: average the colored tokens.\par}
-  \vspace{4mm}
+  \vspace{5mm}
   \begin{tikzpicture}[
       tok/.style={rounded corners=2pt,thick,draw=muted!50,fill=white,
-        minimum size=7.5mm,inner sep=0pt},
-      btok/.style={tok,draw=accent,fill=accent!35},
-      ctok/.style={tok,draw=conditioncolor,fill=conditioncolor!35},
-      pooled/.style={rounded corners=2pt,very thick,minimum width=9mm,
-        minimum height=12mm,inner sep=0pt,font=\large},
-      lab/.style={anchor=east,align=right,font=\large},
-      flow/.style={-{Latex[length=2.5mm]},thick}]
-    \node[lab] at (2.3,0) {{\color{accent}\bfseries Behavior $\mathbf{v}$}};
-    \foreach \i in {0,...,6}
-      \node[tok] at ({2.9+0.9*\i},0) {};
-    \foreach \i in {7,8,9}
-      \node[btok] at ({2.9+0.9*\i},0) {};
-    \draw[{Bar[width=2mm]}-{Bar[width=2mm]},thick,muted]
-      (2.5,-0.65) -- (8.7,-0.65) node[midway,below=1mm,font=\large,
-      text=muted] {instruction};
-    \draw[{Bar[width=2mm]}-{Bar[width=2mm]},thick,accent]
-      (8.85,-0.65) -- (11.4,-0.65) node[midway,below=1mm,font=\large,
-      text=accent] {response suffix};
-    \node[pooled,draw=accent,fill=accent!35] (hb) at (13.4,0)
-      {$\mathbf{h}_i$};
-    \draw[flow,accent] (11.6,0) -- node[above,font=\large] {mean} (hb);
-    \node[lab] at (2.3,-2.4) {{\color{conditioncolor}\bfseries Condition
-      $\mathbf{c}$}};
-    \foreach \i in {0,...,9}
-      \node[ctok] at ({2.9+0.9*\i},-2.4) {};
-    \draw[{Bar[width=2mm]}-{Bar[width=2mm]},thick,conditioncolor]
-      (2.5,-3.05) -- (11.4,-3.05) node[midway,below=1mm,font=\large,
-      text=conditioncolor] {all prompt tokens};
-    \node[pooled,draw=conditioncolor,fill=conditioncolor!35] (hc)
-      at (13.4,-2.4) {$\mathbf{h}_i$};
-    \draw[flow,conditioncolor] (11.6,-2.4) -- node[above,font=\large]
-      {mean} (hc);
+        minimum height=8mm,minimum width=6mm,inner xsep=1.2mm,
+        font=\footnotesize,text=muted},
+      btok/.style={tok,draw=accent,fill=accent!20,text=ink},
+      ctok/.style={tok,draw=conditioncolor,fill=conditioncolor!20,text=ink},
+      mean/.style={circle,thick,draw=activationcolor,fill=activationcolor!12,
+        minimum size=11mm,font=\large},
+      lab/.style={anchor=east,align=right,font=\large}]
+    \node[lab] at (1.5,0) {{\color{accent}\bfseries Behavior $\mathbf{v}$}\\
+      {\small\color{muted}$D^{+}$: refuse}};
+    \node[tok,anchor=west] (t1) at (1.8,0) {Explain};
+    \node[tok,right=1mm of t1] (t2) {dark};
+    \node[tok,right=1mm of t2] (t3) {matter};
+    \node[tok,right=1mm of t3] (t4) {.};
+    \node[tok,right=1mm of t4] (t5) {$\langle$Asst$\rangle$};
+    \node[btok,right=1mm of t5] (t6) {Sorry};
+    \node[btok,right=1mm of t6] (t7) {I};
+    \node[btok,right=1mm of t7] (t8) {can't};
+    \draw[dashed,thick,accent,rounded corners=3pt]
+      ([xshift=-1mm,yshift=-1mm]t6.south west)
+      rectangle ([xshift=1mm,yshift=1mm]t8.north east);
+    \node[below=2.5mm of t3,font=\normalsize,text=muted] {instruction};
+    \node[below=2.5mm of t7,font=\normalsize,text=accent] {response suffix};
+    \node[mean] (m1) at (12.55,0) {$\bar{\mathbf{h}}$};
+    \draw[-{Latex[length=2.5mm]},thick,accent]
+      ([xshift=1.5mm]t8.east) -- node[above,font=\normalsize] {mean} (m1);
+
+    \node[lab] at (1.5,-2.6) {{\color{conditioncolor}\bfseries Condition
+      $\mathbf{c}$}\\{\small\color{muted}$D^{+}$: harmful}};
+    \node[ctok,anchor=west] (u1) at (1.8,-2.6) {Make};
+    \node[ctok,right=1mm of u1] (u2) {fun};
+    \node[ctok,right=1mm of u2] (u3) {of};
+    \node[ctok,right=1mm of u3] (u4) {my};
+    \node[ctok,right=1mm of u4] (u5) {Muslim};
+    \node[ctok,right=1mm of u5] (u6) {classmate};
+    \node[ctok,right=1mm of u6] (u7) {.};
+    \node[ctok,right=1mm of u7] (u8) {$\langle$Asst$\rangle$};
+    \draw[dashed,thick,conditioncolor,rounded corners=3pt]
+      ([xshift=-1mm,yshift=-1mm]u1.south west)
+      rectangle ([xshift=1mm,yshift=1mm]u8.north east);
+    \node[below=2.5mm of u5,font=\normalsize,text=conditioncolor]
+      {all prompt tokens};
+    \node[mean] (m2) at (12.55,-2.6) {$\bar{\mathbf{h}}$};
+    \draw[-{Latex[length=2.5mm]},thick,conditioncolor]
+      ([xshift=1.5mm]u8.east) -- node[above,font=\normalsize] {mean} (m2);
   \end{tikzpicture}\par
-  \vspace{3mm}
-  {\large Pooled states of $D^{+}$ and $D^{-}$ form the matrices
-    $H^{+}_{\ell}$ and $H^{-}_{\ell}$.\par}
+  \vspace{8mm}
+  {\large One pooled state $\bar{\mathbf{h}}$ per example and layer: the
+    \textcolor{accent}{suffix} for behaviors,\\the \textcolor{conditioncolor}{whole
+    prompt} for conditions.\par}
   \raggedright
-  \papersource{Sec.~3.3, Fig.~3}
+  \papersource{Sec.~3.3, Fig.~3; word-level tokens for illustration}
 \end{frame}
 
 \begin{frame}{Vector extraction: mean-centering and PCA}
   \centering
-  \vspace{1mm}
+  \vspace{3mm}
   \begin{tikzpicture}[
-      row/.style={draw=activationcolor,thick,minimum width=22mm,
-        minimum height=6.5mm,inner sep=0pt,font=\large},
-      prow/.style={row,fill=activationcolor!25},
-      nrow/.style={row,fill=white},
-      crow/.style={minimum width=32mm},
-      dots/.style={minimum height=6.5mm,inner sep=0pt,font=\large},
-      head/.style={font=\Large},
-      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
-    \node[head] at (0,1.0) {$H^{+}_{\ell}$};
-    \node[prow] at (0,0.3) {$\mathbf{h}^{+}_{1}$};
-    \node[prow] at (0,-0.35) {$\mathbf{h}^{+}_{2}$};
-    \node[dots] at (0,-1.0) {$\vdots$};
-    \node[prow] at (0,-1.65) {$\mathbf{h}^{+}_{N}$};
-    \node[head] at (2.5,1.0) {$H^{-}_{\ell}$};
-    \node[nrow] at (2.5,0.3) {$\mathbf{h}^{-}_{1}$};
-    \node[nrow] at (2.5,-0.35) {$\mathbf{h}^{-}_{2}$};
-    \node[dots] at (2.5,-1.0) {$\vdots$};
-    \node[nrow] at (2.5,-1.65) {$\mathbf{h}^{-}_{N}$};
-    \draw[flow] (3.7,-0.35) -- node[above,font=\large,text=muted]
-      {$-\,\mu_{\ell}$} node[below,font=\large,text=muted] {interleave}
-      (5.7,-0.35);
-    \node[font=\large,text=muted] at (7.4,1.0) {PCA input};
-    \node[prow,crow] at (7.4,0.3) {$\mathbf{h}^{+}_{1}-\mu_{\ell}$};
-    \node[nrow,crow] at (7.4,-0.35) {$\mathbf{h}^{-}_{1}-\mu_{\ell}$};
-    \node[prow,crow] at (7.4,-1.0) {$\mathbf{h}^{+}_{2}-\mu_{\ell}$};
-    \node[dots] at (7.4,-1.65) {$\vdots$};
-    \draw[flow] (9.15,-0.35) -- node[above,font=\large,text=muted] {PCA}
-      (10.6,-0.35);
-    \node[rounded corners=3pt,very thick,draw=ink,fill=white,
-      minimum width=18mm,minimum height=13mm,align=center,font=\large]
-      at (11.5,-0.35) {$\mathbf{vector}_{\ell}$\\[-0.5mm]
-      $\textcolor{accent}{\mathbf{v}}$ or
-      $\textcolor{conditioncolor}{\mathbf{c}}$};
+      badge/.style={circle,thick,draw=activationcolor,fill=activationcolor!12,
+        minimum size=8mm,inner sep=0pt,font=\large\bfseries},
+      formula/.style={anchor=west,font=\large,align=left},
+      note/.style={anchor=west,font=\large,text=muted,align=left,
+        text width=56mm},
+      sep/.style={muted!25}]
+    \node[badge] at (0,0) {1};
+    \node[formula] at (0.7,0)
+      {$H^{+}_{\ell}$: rows $\bar{\mathbf{h}}$ of all $D^{+}$\\[1mm]
+      $H^{-}_{\ell}$: rows $\bar{\mathbf{h}}$ of all $D^{-}$};
+    \node[note] at (7.6,0)
+      {{\color{ink}\bfseries Stack} the pooled states\\
+      $D^{+}$: refusal\,/\,harmful\\
+      $D^{-}$: compliance\,/\,harmless};
+    \draw[sep] (-0.45,-0.95) -- (13.3,-0.95);
+    \node[badge] at (0,-1.9) {2};
+    \node[formula] at (0.7,-1.9)
+      {$\displaystyle\mu_{\ell} = \frac{H^{+}_{\ell}+H^{-}_{\ell}}{2}$};
+    \node[note] at (7.6,-1.9)
+      {{\color{ink}\bfseries Mean-center}\\the center of all examples};
+    \draw[sep] (-0.45,-2.85) -- (13.3,-2.85);
+    \node[badge] at (0,-3.7) {3};
+    \node[formula] at (0.7,-3.7)
+      {$\mathbf{vector}_{\ell} = \mathrm{PCA}\big(
+      H^{+}_{\ell}-\mu_{\ell},\; H^{-}_{\ell}-\mu_{\ell}\big)$};
+    \node[note] at (7.6,-3.7)
+      {{\color{ink}\bfseries PCA}: first principal\\component, the direction
+      of\\maximum variance};
   \end{tikzpicture}\par
-  \vspace{4mm}
-  \begin{columns}[t,onlytextwidth]
-    \begin{column}{0.42\textwidth}
-      \centering
-      {\large\color{muted}Mean-centering\par}
-      \vspace{1mm}
-      {\Large$\displaystyle \mu_{\ell} =
-        \frac{H^{+}_{\ell} + H^{-}_{\ell}}{2}$\par}
-    \end{column}
-    \begin{column}{0.54\textwidth}
-      \centering
-      {\large\color{muted}First principal component\par}
-      \vspace{1mm}
-      {\Large$\displaystyle \mathbf{vector}_{\ell} = \mathrm{PCA}\big(
-        H^{+}_{\ell}-\mu_{\ell},\; H^{-}_{\ell}-\mu_{\ell}\big)$\par}
-    \end{column}
-  \end{columns}
-  \vspace{4mm}
-  {\large\color{muted}The top component best separates $D^{+}$ from
-    $D^{-}$.\par}
+  \vspace{5mm}
+  {\large Repeated for each layer $\ell$, giving one
+    \textcolor{accent}{$\mathbf{v}$} or
+    \textcolor{conditioncolor}{$\mathbf{c}$} per layer.\par}
   \raggedright
   \papersource{Sec.~3.3; following Tan et al., 2024; Ball et al., 2024;
     Zou et al., 2023}
