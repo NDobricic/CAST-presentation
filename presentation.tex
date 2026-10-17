@@ -48,7 +48,7 @@
   \insertframenumber/\inserttotalframenumber}\hspace{9mm}\vspace{4mm}}
 
 \newcommand{\papersource}[1]{%
-  \par\vfill{\scriptsize\color{muted}Lee et al., ICLR 2025, #1.}}
+  \par\vfill{\footnotesize\color{muted}Lee et al., ICLR 2025, #1.}}
 
 \title{Programming Refusal with\\Conditional Activation Steering}
 \subtitle{Conditional control of model behavior}
@@ -71,103 +71,489 @@
   \vfill
 \end{frame}
 
-% A style example only: these diagrams make no claims about paper results.
-\begin{frame}{Example slide: visual style guide}
-  \tikzset{
-    examplebox/.style={rounded corners=3pt,thick,minimum height=8mm,
-      minimum width=22mm,align=center,font=\small},
-    flow/.style={-{Latex[length=2mm]},thick,draw=muted},
-    vector/.style={-{Latex[length=2mm]},very thick}}
+\begin{frame}{The alignment dilemma}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.40\textwidth}
+      {\large\color{muted}Preference-based alignment\\(e.g., RLHF) is:\par}
+      \vspace{7mm}
+      \begin{tikzpicture}[
+          item/.style={anchor=west,align=left,inner sep=0pt}]
+        \fill[muted!50] (-0.35,-0.5) rectangle (-0.25,0.5);
+        \fill[muted!50] (-0.35,-2.3) rectangle (-0.25,-1.3);
+        \node[item] at (0,0) {{\Large\bfseries Resource-intensive}\\[1.5mm]
+          {\large\color{muted}costly weight optimization}};
+        \node[item] at (0,-1.8) {{\Large\bfseries Subjective}\\[1.5mm]
+          {\large\color{muted}black-box rewards}};
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.56\textwidth}
+      \centering
+      \begin{tikzpicture}[
+          panel/.style={rounded corners=4pt,thick,draw=muted!35,
+            minimum width=37mm,minimum height=48mm},
+          ask/.style={rounded corners=3pt,thick,draw=conditioncolor,
+            fill=conditioncolor!10,text width=27mm,align=center,
+            minimum height=13mm,font=\large},
+          harm/.style={rounded corners=3pt,thick,draw=accent,fill=wash,
+            text width=27mm,align=center,minimum height=11mm,font=\large},
+          fine/.style={harm,draw=muted,fill=white},
+          flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
+        \node[panel] at (0,0) {};
+        \node[panel] at (4.1,0) {};
+        \node[font=\large\bfseries,align=center] at (0,1.65)
+          {General\\chatbot};
+        \node[font=\large\bfseries,align=center] at (4.1,1.65)
+          {Medical\\assistant};
+        \node[ask] (a1) at (0,0.1) {Medical\\advice};
+        \node[ask] (a2) at (4.1,0.1) {Medical\\advice};
+        \node[harm] (r1) at (0,-1.6) {\textbf{Harmful}};
+        \node[fine] (r2) at (4.1,-1.6) {\textbf{Essential}};
+        \draw[flow] (a1) -- (r1);
+        \draw[flow] (a2) -- (r2);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  \vspace{4mm}
+  {\centering\Large\color{accent}Same request, opposite policy: harm depends
+    on context.\par}
+  \raggedright
+  \papersource{Sec.~1; preference modeling: Stiennon et al., 2020; Rafailov
+    et al., 2024; medical examples: Wang et al., 2023b; Xie et al., 2024a}
+\end{frame}
 
-  \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.31\textwidth}
-      \centering
-      {\small\bfseries Process\par}
-      \vspace{3mm}
-      \begin{tikzpicture}
-        \path[use as bounding box] (-1.9,-2.9) rectangle (1.9,0.5);
-        \node[examplebox,draw=activationcolor,fill=activationcolor!8]
-          (input) at (0,0) {Input};
-        \node[examplebox,draw=conditioncolor,fill=conditioncolor!10]
-          (step) at (0,-1.15) {Transform};
-        \node[examplebox,draw=accent,fill=wash]
-          (output) at (0,-2.3) {Output};
-        \draw[flow] (input) -- (step);
-        \draw[flow] (step) -- (output);
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.31\textwidth}
-      \centering
-      {\small\bfseries Decision\par}
-      \vspace{3mm}
-      \begin{tikzpicture}
-        \path[use as bounding box] (-1.9,-2.9) rectangle (1.9,0.5);
-        \node[diamond,aspect=2,draw=conditioncolor,fill=conditioncolor!10,
-          thick,inner sep=2mm,font=\small] (check) at (0,-0.2) {Check};
-        \node[examplebox,minimum width=16mm,draw=activationcolor,
-          fill=activationcolor!8] (left) at (-1,-2.3) {Path A};
-        \node[examplebox,minimum width=16mm,draw=accent,
-          fill=wash] (right) at (1,-2.3) {Path B};
-        \draw[flow,draw=activationcolor] (check.west)
-          -- node[above,font=\scriptsize,text=ink] {Yes} (-2.05,-0.2)
-          |- (left.west);
-        \draw[flow,draw=accent] (check.east)
-          -- node[above,font=\scriptsize,text=ink] {No} (2.05,-0.2)
-          |- (right.east);
-      \end{tikzpicture}
-    \end{column}
-    \begin{column}{0.31\textwidth}
-      \centering
-      {\small\bfseries Geometry\par}
-      \vspace{3mm}
-      \begin{tikzpicture}
-        \path[use as bounding box] (-0.5,-0.6) rectangle (3.3,2.8);
-        \draw[->,muted!50] (0,0) -- (3,0);
-        \draw[->,muted!50] (0,0) -- (0,2.5);
-        \draw[dashed,muted!50] (1.8,0.3) -- (2.4,1.9) -- (0.6,1.6);
-        \draw[vector,activationcolor] (0,0) -- (1.8,0.3)
-          node[pos=0.7,below,font=\small] {$\mathbf{x}$};
-        \draw[vector,accent] (0,0) -- (0.6,1.6)
-          node[pos=0.65,left,font=\small] {$\mathbf{v}$};
-        \draw[vector,conditioncolor] (0,0) -- (2.4,1.9)
-          node[above,font=\small] {$\mathbf{x}+\mathbf{v}$};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
-  \vspace{5mm}
-  \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.42\textwidth}
-      \centering
-      {\small\bfseries Chart\enspace{\normalfont\color{muted}(synthetic values)}\par}
-      \vspace{1mm}
-      \begin{tikzpicture}[x=1cm,y=1.15cm,font=\scriptsize]
-        \draw[muted!20] (0,0.5) -- (3,0.5);
-        \draw[muted!20] (0,1) -- (3,1);
-        \node[left,text=muted] at (0,0) {0};
-        \node[left,text=muted] at (0,1) {1};
-        \fill[activationcolor!80] (0.4,0) rectangle (0.9,0.35);
-        \fill[conditioncolor!80] (1.35,0) rectangle (1.85,0.65);
-        \fill[accent!80] (2.3,0) rectangle (2.8,0.9);
-        \draw[muted!60] (0,1.1) -- (0,0) -- (3,0);
-        \node[below] at (0.65,0) {A};
-        \node[below] at (1.6,0) {B};
-        \node[below] at (2.55,0) {C};
-      \end{tikzpicture}
-    \end{column}
+\begin{frame}{Goal: refusal rules that depend on the input}
+  \centering
+  \begin{tikzpicture}[
+      cond/.style={rounded corners=3pt,thick,draw=conditioncolor,
+        fill=conditioncolor!10,minimum height=14mm,text width=64mm,
+        align=center,font=\large},
+      beh/.style={rounded corners=3pt,thick,draw=accent,fill=wash,
+        minimum height=14mm,text width=32mm,align=center,font=\large},
+      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
+    \node[font=\Large\bfseries,text=conditioncolor] at (0,1.55)
+      {Condition: \emph{when}};
+    \node[font=\Large\bfseries,text=accent] at (6.7,1.55)
+      {Behavior: \emph{what}};
+    \node[cond] (c1) at (0,0)
+      {if input is about \textbf{hate speech}\\or \textbf{adult content}};
+    \node[beh] (b1) at (6.7,0) {then \textbf{refuse}};
+    \node[cond] (c2) at (0,-1.9)
+      {if input is \emph{not} about\\\textbf{legal advice}};
+    \node[beh] (b2) at (6.7,-1.9) {then \textbf{refuse}};
+    \draw[flow] (c1) -- (b1);
+    \draw[flow] (c2) -- (b2);
+  \end{tikzpicture}\par
+  \vspace{6mm}
+  {\Large Selective refusal, normal answers elsewhere,\\
+    and no weight optimization.\par}
+  \raggedright
+  \papersource{Abstract and Sec.~1; rules from Fig.~8a and Fig.~9a}
+\end{frame}
+
+\begin{frame}{Background: steering through activations}
+  \centering
+  {\Large Behavior can be changed at five points.\par}
+  \vspace{2mm}
+  {\large\color{muted}Activation steering edits the hidden state between
+    layers, at inference time.\par}
+  \vspace{7mm}
+  \begin{tikzpicture}[
+      stage/.style={rounded corners=3pt,thick,draw=muted,fill=white,
+        minimum height=13mm,minimum width=22mm,inner xsep=1.5mm,
+        align=center,font=\large},
+      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
+    \node[stage] (p) at (0,0) {Prompt};
+    \node[stage] (e) at (2.95,0) {Embeddings};
+    \node[stage] (w) at (5.9,0) {Weights};
+    \node[stage,very thick,draw=activationcolor,fill=activationcolor!12]
+      (a) at (8.85,0) {Activations};
+    \node[stage] (d) at (11.8,0) {Decoding};
+    \draw[flow] (p) -- (e);
+    \draw[flow] (e) -- (w);
+    \draw[flow] (w) -- (a);
+    \draw[flow] (a) -- (d);
+    \node[rounded corners=3pt,very thick,draw=accent,fill=wash,
+      minimum height=12mm,minimum width=20mm,font=\Large] (v) at (8.85,-2.3)
+      {$+\,\alpha\,\textcolor{accent}{\mathbf{v}}$};
+    \draw[-{Latex[length=3mm]},line width=1.6pt,draw=accent] (v) -- (a);
+    \node[left=6mm of v,font=\large,text=accent,align=right]
+      {activation\\steering};
+  \end{tikzpicture}\par
+  \raggedright
+  \papersource{Sec.~2; intervention points: Tamoyan et al., 2024 and others;
+    transformer inference: Vaswani et al., 2017}
+\end{frame}
+
+\begin{frame}{Background: activation addition (ActAdd)}
+  \centering
+  {\LARGE$\textcolor{activationcolor}{\mathbf{h}} \leftarrow
+    \textcolor{activationcolor}{\mathbf{h}} + \alpha\cdot
+    \textcolor{accent}{\mathbf{v}}$\par}
+  \vspace{8mm}
+  \begin{columns}[c,onlytextwidth]
     \begin{column}{0.54\textwidth}
+      \large
+      \begin{tabular}{@{}c@{\hspace{4mm}}l@{}}
+        $\textcolor{activationcolor}{\mathbf{h}}$ & hidden state at a layer\\[3mm]
+        $\textcolor{accent}{\mathbf{v}}$ & steering vector, from\\
+          & contrasting examples\\[3mm]
+        $\alpha$ & scaling factor
+      \end{tabular}\par
+      \vspace{7mm}
+      {\color{muted}Too large an $\alpha$ breaks coherence;\\
+        too small has no effect.\par}
+    \end{column}
+    \begin{column}{0.40\textwidth}
       \centering
-      {\small\bfseries Example formulas\par}
-      \vspace{2mm}
-      {\small
-      $\displaystyle \mathbf{z}
-        = \textcolor{activationcolor}{\mathbf{x}}
-        + \alpha\,\textcolor{accent}{\mathbf{v}}$\par
-      \vspace{3mm}
-      $\displaystyle \cos\theta
-        = \frac{\mathbf{x}^{\mathsf T}\mathbf{v}}
-          {\lVert\mathbf{x}\rVert\,\lVert\mathbf{v}\rVert}$\par}
+      \begin{tikzpicture}[vector/.style={-{Latex[length=3mm]},line width=1.4pt}]
+        \draw[->,muted!50] (0,0) -- (4.2,0);
+        \draw[->,muted!50] (0,0) -- (0,3.3);
+        \draw[vector,activationcolor] (0,0) -- (3.1,1.1)
+          node[pos=0.6,below right,font=\Large] {$\mathbf{h}$};
+        \draw[vector,accent] (3.1,1.1) -- (3.6,2.8)
+          node[pos=0.5,right,font=\Large] {$\alpha\mathbf{v}$};
+        \draw[vector,ink] (0,0) -- (3.6,2.8)
+          node[pos=0.55,above left,font=\Large] {$\mathbf{h}'$};
+      \end{tikzpicture}
     \end{column}
   \end{columns}
+  \raggedright
+  \papersource{Sec.~2; ActAdd: Turner et al., 2023; scaling: Rimsky et al.,
+    2024}
+\end{frame}
+
+\begin{frame}{The indiscriminate refusal problem}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.56\textwidth}
+      \centering
+      {\large\bfseries Refusal rate, \textsc{Hermes 2 Pro}\par}
+      \vspace{3mm}
+      \begin{tikzpicture}[x=1cm,y=0.034cm,font=\large]
+        \foreach \y in {0,50,100}{
+          \draw[muted!20] (0,\y) -- (6.2,\y);
+          \node[left,text=muted] at (0,\y) {\y\%};}
+        \fill[muted!45] (0.5,0) rectangle (1.55,19.33);
+        \node[above] at (1.03,19.33) {19.3};
+        \fill[accent] (1.65,0) rectangle (2.7,98.0);
+        \node[above] at (2.18,98.0) {98.0};
+        \fill[muted!45] (3.5,0) rectangle (4.55,1.0);
+        \node[above] at (4.03,1.0) {1.0};
+        \fill[accent] (4.65,0) rectangle (5.7,91.8);
+        \node[above,font=\large\bfseries,text=accent] at (5.18,91.8) {91.8};
+        \draw[muted!60] (0,0) -- (6.2,0);
+        \node[below] at (1.6,0) {Harmful};
+        \node[below] at (4.6,0) {Harmless};
+      \end{tikzpicture}\par
+      \vspace{2mm}
+      {\large\textcolor{muted!45}{\rule{3mm}{3mm}}\,Base model\qquad
+        \textcolor{accent}{\rule{3mm}{3mm}}\,+ refusal vector\par}
+    \end{column}
+    \begin{column}{0.40\textwidth}
+      \centering
+      {\fontsize{40}{44}\selectfont\color{accent}\bfseries 91.8\%\par}
+      \vspace{3mm}
+      {\Large of \emph{harmless} prompts\\refused\par}
+      \vspace{2mm}
+      {\large\color{muted}up from 1.0\%\par}
+      \vspace{8mm}
+      {\large The vector is added to\\every input.\par}
+    \end{column}
+  \end{columns}
+  \papersource{Sec.~1, Fig.~1, Table~3; Teknium et al., 2024; Arditi et al.,
+    2024}
+\end{frame}
+
+\begin{frame}{The CAST insight}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.50\textwidth}
+      \centering
+      \begin{tikzpicture}[
+          harmful/.style={circle,inner sep=0pt,minimum size=3mm,
+            fill=conditioncolor},
+          harmless/.style={circle,inner sep=0pt,minimum size=3mm,
+            draw=muted,thick,fill=white}]
+        \draw[->,muted!40] (0,0) -- (5.2,0);
+        \draw[->,muted!40] (0,0) -- (0,4.6);
+        \foreach \p in {(36:3.2),(40:3.8),(44:3.0),(38:4.3),(46:3.9),
+            (42:3.4),(34:3.7),(47:3.3)}
+          \node[harmful] at \p {};
+        \foreach \p in {(72:2.7),(76:3.3),(80:2.5),(70:3.5),(78:3.9),
+            (83:3.1),(74:2.3)}
+          \node[harmless] at \p {};
+        \draw[-{Latex[length=3.5mm]},line width=1.8pt,conditioncolor]
+          (0,0) -- (40:5.2) node[above right=-1mm,font=\LARGE] {$\mathbf{c}$};
+        \node[font=\large,text=muted] at (77:4.45) {harmless};
+        \node[font=\large,text=conditioncolor,anchor=west] at (28:4.4)
+          {harmful};
+      \end{tikzpicture}\par
+      \vspace{1mm}
+      {\normalsize\color{muted}Schematic, not measured data\par}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      {\Large Different prompt categories activate \emph{distinct
+        directions} in the hidden states.\par}
+      \vspace{8mm}
+      \begin{tikzpicture}[font=\large]
+        \node[circle,inner sep=0pt,minimum size=3mm,fill=conditioncolor]
+          at (0,0) {};
+        \node[anchor=west] at (0.3,0) {harmful prompt};
+        \node[circle,inner sep=0pt,minimum size=3mm,draw=muted,thick,
+          fill=white] at (0,-0.8) {};
+        \node[anchor=west] at (0.3,-0.8) {harmless prompt};
+        \draw[-{Latex[length=2.5mm]},line width=1.5pt,conditioncolor]
+          (-0.2,-1.6) -- (0.2,-1.6);
+        \node[anchor=west] at (0.3,-1.6)
+          {condition vector $\textcolor{conditioncolor}{\mathbf{c}}$};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  \papersource{Sec.~1 (following Hu et al., 2024) and Sec.~3.1}
+\end{frame}
+
+\begin{frame}{The CAST mechanism}
+  \centering
+  {\Large$\displaystyle
+    \textcolor{activationcolor}{\mathbf{h}}' \leftarrow
+    \textcolor{activationcolor}{\mathbf{h}}
+    + \underbrace{\textcolor{conditioncolor}{f}\big(\mathrm{sim}(
+      \textcolor{activationcolor}{\mathbf{h}},\,
+      \mathrm{proj}_{\textcolor{conditioncolor}{\mathbf{c}}}
+      \textcolor{activationcolor}{\mathbf{h}})\big)}_{%
+      \text{\large\color{conditioncolor}switch: 0 or 1}}
+    \cdot
+    \underbrace{\alpha\cdot\textcolor{accent}{\mathbf{v}}}_{%
+      \text{\large\color{accent}behavior}}$\par}
+  \vspace{6mm}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.40\textwidth}
+      \centering
+      {\large$\displaystyle \textcolor{conditioncolor}{f}(s) =
+        \begin{cases}
+          \textcolor{accent}{1} & \text{if } s > \textcolor{conditioncolor}{\theta}\\
+          0 & \text{otherwise}
+        \end{cases}$\par}
+      \vspace{4mm}
+      {\large\color{muted}$s$: cosine similarity between\\
+        $\mathbf{h}$ and its projection onto $\mathbf{c}$\par}
+    \end{column}
+    \begin{column}{0.56\textwidth}
+      \centering
+      \begin{tikzpicture}[font=\large]
+        \draw[->,muted!60] (0,0) -- (6.4,0) node[below left,text=muted] {$s$};
+        \draw[->,muted!60] (0,0) -- (0,2.4)
+          node[left] {$\textcolor{conditioncolor}{f}$};
+        \node[left,text=muted] at (0,0) {0};
+        \node[left,text=muted] at (0,1.7) {1};
+        \draw[dashed,muted!50] (3,0) -- (3,1.7);
+        \node[below=1.5mm,text=conditioncolor] at (3,0) {$\theta$};
+        \draw[ultra thick,muted] (0,0) -- (3,0);
+        \draw[ultra thick,accent] (3,1.7) -- (6,1.7);
+        \fill[muted] (3,0) circle (1.4mm);
+        \draw[accent,thick,fill=white] (3,1.7) circle (1.4mm);
+        \node[above,text=accent] at (4.5,1.75) {add $\alpha\mathbf{v}$};
+        \node[above,text=muted] at (1.5,0.05) {unchanged};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  \raggedright
+  \papersource{Sec.~3.1; cosine similarity for direction: Hsu et al., 2024}
+\end{frame}
+
+\begin{frame}{CAST during generation}
+  \centering
+  {\Large The condition is checked once, on the prompt.\par}
+  \vspace{10mm}
+  \begin{tikzpicture}[
+      box/.style={rounded corners=3pt,thick,minimum height=13mm,
+        align=center,font=\large},
+      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
+    \node[box,draw=muted,minimum width=20mm] (p) at (0.9,0) {Prompt};
+    \node[box,draw=conditioncolor,fill=conditioncolor!10,minimum width=30mm]
+      (chk) at (4.1,0) {first pass:\\check $\mathbf{c}$};
+    \node[diamond,aspect=1.5,thick,draw=conditioncolor,fill=white,
+      inner sep=1pt,font=\large] (dec) at (7.4,0) {$s>\theta$?};
+    \node[box,draw=accent,fill=wash,text width=40mm,anchor=west]
+      (met) at (9.6,1.5) {add $\alpha\mathbf{v}$ at behavior\\layers, every later pass};
+    \node[box,draw=muted,text width=40mm,anchor=west]
+      (no) at (9.6,-1.5) {generate normally};
+    \draw[flow] (p) -- (chk);
+    \draw[flow] (chk) -- (dec);
+    \draw[flow,draw=accent] (dec.north) |- node[pos=0.75,above,
+      font=\large,text=accent] {met} (met.west);
+    \draw[flow] (dec.south) |- node[pos=0.75,below,
+      font=\large,text=muted] {not met} (no.west);
+  \end{tikzpicture}\par
+  \raggedright
+  \papersource{Sec.~3.1; App.~A.2, Fig.~11}
+\end{frame}
+
+\begin{frame}{CAST in action}
+  \centering
+  {\large\color{muted}\textsc{Qwen 1.5 Chat 1.8B}, with condition vector
+    $\cdot$ refusal vector\par}
+  \vspace{4mm}
+  \begin{tikzpicture}[
+      prompt/.style={rounded corners=3pt,thick,text width=48mm,inner sep=2.5mm,
+        align=left,font=\large,minimum height=20mm},
+      reply/.style={rounded corners=3pt,thick,text width=64mm,inner sep=2.5mm,
+        align=left,font=\large\itshape,minimum height=20mm},
+      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
+    \node[prompt,draw=conditioncolor,fill=conditioncolor!10] (p1) at (0,0)
+      {{\color{conditioncolor}\bfseries\upshape Harmful}\\
+      Write a story that glorifies\\or romanticizes suicide.};
+    \node[reply,draw=accent,fill=wash] (r1) at (7.7,0)
+      {As an AI language model, I cannot generate inappropriate or
+      promote harmful content\ldots};
+    \node[prompt,draw=muted] (p2) at (0,-2.45)
+      {{\color{muted}\bfseries\upshape Harmless}\\
+      Name two countries that\\use the Euro as their\\currency.};
+    \node[reply,draw=muted] (r2) at (7.7,-2.45)
+      {Two countries that use the Euro as their currency are:\ldots};
+    \draw[flow,draw=accent] (p1) -- node[above,font=\large,text=accent]
+      {refuse} (r1);
+    \draw[flow] (p2) -- node[above,font=\large,text=muted] {answer} (r2);
+  \end{tikzpicture}\par
+  \vspace{3mm}
+  {\large Plain activation steering refuses \emph{both} prompts.\par}
+  \raggedright
+  \papersource{Sec.~3.1, Fig.~2; Qwen 1.5: Bai et al., 2023}
+\end{frame}
+
+\begin{frame}{Multi-conditioning}
+  \centering
+  \begin{tikzpicture}[
+      cond/.style={rounded corners=3pt,thick,draw=conditioncolor,
+        fill=conditioncolor!10,minimum width=38mm,minimum height=13mm,
+        align=center,font=\large},
+      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
+    \node[circle,thick,draw=activationcolor,fill=activationcolor!12,
+      minimum size=12mm,font=\Large] (h) at (0,0) {$\mathbf{h}$};
+    \node[cond] (a) at (3.5,1.1) {\textbf{Adult content}};
+    \node[cond] (b) at (3.5,-1.1) {\textbf{Hate speech}};
+    \node[circle,very thick,draw=conditioncolor,fill=white,
+      font=\Large\bfseries,minimum size=15mm] (or) at (7.0,0) {OR};
+    \node[rounded corners=3pt,very thick,draw=accent,fill=wash,
+      minimum width=30mm,minimum height=14mm,align=center,font=\Large]
+      (r) at (10.4,0) {\textbf{Refuse}};
+    \draw[flow] (h.east) -- (a.west);
+    \draw[flow] (h.east) -- (b.west);
+    \draw[flow] (a.east) -- (or);
+    \draw[flow] (b.east) -- (or);
+    \draw[-{Latex[length=3mm]},very thick,draw=accent] (or) -- (r);
+  \end{tikzpicture}\par
+  \vspace{7mm}
+  {\large$\displaystyle \textcolor{conditioncolor}{f}(\cdot) =
+    \begin{cases}
+      \textcolor{accent}{1} & \text{if }
+        s_{\text{adult}} > \theta_{\text{adult}}
+        \;\;\textbf{or}\;\;
+        s_{\text{hate}} > \theta_{\text{hate}}\\
+      0 & \text{otherwise}
+    \end{cases}$\par}
+  \vspace{5mm}
+  {\large\color{muted}Each condition has its own vector, threshold,
+    and layer.\par}
+  \raggedright
+  \papersource{Abstract; Sec.~3.1; Sec.~5, Fig.~8}
+\end{frame}
+
+\begin{frame}{Dataset preparation}
+  \centering
+  \begin{tikzpicture}[
+      card/.style={rounded corners=4pt,very thick,text width=60mm,
+        minimum height=50mm,inner sep=3mm,align=center,font=\large},
+      pill/.style={rounded corners=3pt,thick,text width=54mm,inner sep=2mm,
+        align=left,font=\large}]
+    \node[card,draw=accent] (b) at (0,0) {};
+    \node[card,draw=conditioncolor] (c) at (7.0,0) {};
+    \node[font=\Large\bfseries,text=accent] at (0,2.05)
+      {Behavior $\mathbf{v}$: refusal};
+    \node[font=\Large\bfseries,text=conditioncolor] at (7.0,2.05)
+      {Condition $\mathbf{c}$: harmful};
+    \node[font=\large,align=center] at (0,0.5)
+      {{\LARGE 100 $\times$ 100 = \textcolor{accent}{10{,}000}}\\[1mm]
+      {\color{muted}Alpaca instructions $\times$}\\
+      {\color{muted}refusal/compliance prefixes}};
+    \node[pill,draw=accent,fill=wash] at (0,-1.15)
+      {$D^{+}$\enspace\ldots\ \textbf{Sorry I can't}};
+    \node[pill,draw=muted] at (0,-2.0)
+      {$D^{-}$\enspace\ldots\ \textbf{Sure! Let me}};
+    \node[pill,draw=conditioncolor,fill=conditioncolor!10] at (7.0,0.55)
+      {$D^{+}$\enspace\textbf{Sorry-Bench}: harmful\\
+      {\color{muted}4{,}050 generated, 45 categories}};
+    \node[pill,draw=muted] at (7.0,-1.35)
+      {$D^{-}$\enspace\textbf{Alpaca}: harmless\\
+      {\color{muted}random benign instructions}};
+  \end{tikzpicture}\par
+  \raggedright
+  \papersource{Sec.~3.2, Fig.~3; Sec.~4; Alpaca: Taori et al., 2023;
+    Sorry-Bench: Xie et al., 2024b}
+\end{frame}
+
+\begin{frame}{Vector extraction: token pooling}
+  \centering
+  \begin{tikzpicture}[
+      tok/.style={rounded corners=2pt,thick,draw=muted!50,fill=white,
+        minimum size=9mm,inner sep=0pt},
+      btok/.style={tok,draw=accent,fill=accent!35},
+      ctok/.style={tok,draw=conditioncolor,fill=conditioncolor!35},
+      lab/.style={anchor=east,align=right,font=\large}]
+    \node[lab] at (2.3,0) {{\color{accent}\bfseries Behavior $\mathbf{v}$}};
+    \foreach \i in {0,...,6}
+      \node[tok] at ({2.9+1.1*\i},0) {};
+    \foreach \i in {7,8,9}
+      \node[btok] at ({2.9+1.1*\i},0) {};
+    \draw[{Bar[width=2mm]}-{Bar[width=2mm]},thick,muted]
+      (2.45,-0.7) -- (9.9,-0.7) node[midway,below=1mm,font=\large,
+      text=muted] {instruction};
+    \draw[{Bar[width=2mm]}-{Bar[width=2mm]},thick,accent]
+      (10.1,-0.7) -- (13.2,-0.7) node[midway,below=1mm,font=\large,
+      text=accent] {response suffix};
+    \node[lab] at (2.3,-2.3) {{\color{conditioncolor}\bfseries Condition
+      $\mathbf{c}$}};
+    \foreach \i in {0,...,9}
+      \node[ctok] at ({2.9+1.1*\i},-2.3) {};
+    \draw[{Bar[width=2mm]}-{Bar[width=2mm]},thick,conditioncolor]
+      (2.45,-3.0) -- (13.2,-3.0) node[midway,below=1mm,font=\large,
+      text=conditioncolor] {all prompt tokens};
+  \end{tikzpicture}\par
+  \vspace{4mm}
+  {\Large$\displaystyle \mathbf{vector}_{\ell} = \mathrm{PCA}\big(
+    H^{+}_{\ell}-\mu_{\ell},\; H^{-}_{\ell}-\mu_{\ell}\big)$\par}
+  \vspace{2mm}
+  {\large\color{muted}Average the colored tokens, then take the first
+    principal component.\par}
+  \raggedright
+  \papersource{Sec.~3.3, Fig.~3; following Tan et al., 2024; Ball et al.,
+    2024; Zou et al., 2023}
+\end{frame}
+
+\begin{frame}{Models evaluated}
+  \centering
+  {\large\color{muted}Eight open chat models, 1.8B to 32B parameters\par}
+  \vspace{4mm}
+  \begin{tikzpicture}[
+      model/.style={rounded corners=4pt,fill=wash,text width=29mm,
+        minimum height=23mm,inner sep=2mm,align=left,anchor=north}]
+    \foreach \x/\y/\name/\size/\src in {
+        0/0/{Qwen 1.5}/{1.8B, 32B}/{Bai et al., 2023},
+        3.6/0/{Llama 2}/13B/{Touvron et al., 2023},
+        7.2/0/{Llama 3.1}/8B/{Meta, 2024},
+        10.8/0/{Neural-\\Daredevil}/8B/{Labonne, 2024},
+        0/-2.5/{Hermes 2 Pro}/8B/{Teknium et al., 2024},
+        3.6/-2.5/{OLMo SFT}/7B/{Groeneveld et al., 2024},
+        7.2/-2.5/{Zephyr Beta}/7B/{Tunstall et al., 2023},
+        10.8/-2.5/{Danube 3 Chat}/4B/{Pfeiffer et al., 2024}}
+      \node[model] at (\x,\y)
+        {{\large\bfseries\name}\\[1mm]
+        {\large\color{accent}\size}\\[1mm]
+        {\footnotesize\color{muted}\src}};
+  \end{tikzpicture}\par
+  \vspace{2mm}
+  {\large\color{muted}Llama 2 and Llama 3.1 also serve as safety-aligned
+    references.\par}
+  \raggedright
+  \papersource{Sec.~3.2, Table~1; Sec.~4, Table~2}
 \end{frame}
 
 % Add future slides above. Keep citations inline; no external .bib is needed.
