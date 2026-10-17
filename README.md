@@ -4,8 +4,11 @@ Collaborative slides for **Programming Refusal with Conditional Activation
 Steering** (Lee et al., ICLR 2025).
 
 - [`presentation.tex`](presentation.tex): the single presentation source, including
-  styling, diagrams, and references. Contains the title slide and slides covering
-  the paper's motivation, background, and the CAST method.
+  styling, diagrams, and references. Contains the title slide, slides covering
+  the paper's motivation, background, and the CAST method, and a section on our
+  own experiments with a backup slide. Speaker notes use `\note` and are hidden;
+  add `\setbeameroption{show notes on second screen=right}` before
+  `\begin{document}` to show them.
 - [`presentation.pdf`](presentation.pdf): the compiled slides, updated automatically on push.
 - [`paper.pdf`](paper.pdf): the official conference paper, including appendices.
 - [`AGENTS.md`](AGENTS.md): guidance for contributors and coding agents.
