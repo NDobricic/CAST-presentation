@@ -4,8 +4,8 @@ Collaborative slides for **Programming Refusal with Conditional Activation
 Steering** (Lee et al., ICLR 2025).
 
 - [`presentation.tex`](presentation.tex): the single presentation source, including
-  styling, editable TikZ charts, references, and speaker notes. Contains the title
-  slide, six experimental-analysis slides, and one clearly labeled backup slide.
+  styling, diagrams, and references. Contains a title slide and one style example
+  with diagrams, a synthetic chart, and formulas.
 - [`presentation.pdf`](presentation.pdf): the compiled slides, updated automatically on push.
 - [`paper.pdf`](paper.pdf): the official conference paper, including appendices.
 - [`AGENTS.md`](AGENTS.md): guidance for contributors and coding agents.
@@ -117,25 +117,6 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build presentation.
 
 On Windows, create `build` in your file manager or with `mkdir build` first,
 then run the same pdfLaTeX commands in PowerShell.
-
-## Speaker notes
-
-The six-slide experimental section takes approximately **6 minutes 30 seconds**;
-the optional backup is additional. Every slide has embedded Beamer `\note{...}`
-content covering interpretation, methods, caveats, provenance, and timing. Notes
-are hidden in the audience PDF. Export a separate notes PDF from the same source:
-
-```sh
-pdflatex -interaction=nonstopmode -halt-on-error -file-line-error -output-directory=build -jobname=presentation-notes '\def\presenternotes{1}\input{presentation.tex}'
-pdflatex -interaction=nonstopmode -halt-on-error -file-line-error -output-directory=build -jobname=presentation-notes '\def\presenternotes{1}\input{presentation.tex}'
-pdftoppm -png -r 120 build/presentation-notes.pdf build/notes
-```
-
-Visually inspect every notes page too. The output is
-`build/presentation-notes.pdf`; all notes and chart data remain in the single
-`presentation.tex` source. The experimental values follow the parent project's
-completed `notes/ablation-experiments-overview.md` (2026-10-16); they are our
-independent ablations, not results reported by the paper.
 
 ## Review and collaborate
 
