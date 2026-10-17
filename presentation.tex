@@ -591,33 +591,5 @@
     Zou et al., 2023}
 \end{frame}
 
-\begin{frame}{Models evaluated}
-  \centering
-  {\large\color{muted}Eight open chat models, 1.8B to 32B parameters\par}
-  \vspace{4mm}
-  \begin{tikzpicture}[
-      model/.style={rounded corners=4pt,fill=wash,text width=29mm,
-        minimum height=23mm,inner sep=2mm,align=left,anchor=north}]
-    \foreach \x/\y/\name/\size/\src in {
-        0/0/{Qwen 1.5}/{1.8B, 32B}/{Bai et al., 2023},
-        3.6/0/{Llama 2}/13B/{Touvron et al., 2023},
-        7.2/0/{Llama 3.1}/8B/{Meta, 2024},
-        10.8/0/{Neural-\\Daredevil}/8B/{Labonne, 2024},
-        0/-2.5/{Hermes 2 Pro}/8B/{Teknium et al., 2024},
-        3.6/-2.5/{OLMo SFT}/7B/{Groeneveld et al., 2024},
-        7.2/-2.5/{Zephyr Beta}/7B/{Tunstall et al., 2023},
-        10.8/-2.5/{Danube 3 Chat}/4B/{Pfeiffer et al., 2024}}
-      \node[model] at (\x,\y)
-        {{\large\bfseries\name}\\[1mm]
-        {\large\color{accent}\size}\\[1mm]
-        {\footnotesize\color{muted}\src}};
-  \end{tikzpicture}\par
-  \vspace{2mm}
-  {\large\color{muted}Llama 2 and Llama 3.1 also serve as safety-aligned
-    references.\par}
-  \raggedright
-  \papersource{Sec.~3.2, Table~1; Sec.~4, Table~2}
-\end{frame}
-
 % Add future slides above. Keep citations inline; no external .bib is needed.
 \end{document}
