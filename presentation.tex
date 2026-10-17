@@ -662,8 +662,8 @@
       {\small\color{muted}$\mathbf{c}$: first PCA direction}};
     \node[det,draw=activationcolor,fill=activationcolor!12] (l) at (7.65,-1.15)
       {{\large\bfseries\color{activationcolor}Linear probe}\\[1mm]
-      $\mathbf{w}^{\top}\bar{\mathbf{h}} + b > 0$\\[0.5mm]
-      {\small\color{muted}$\mathbf{w}$: trained on the labels}};
+      $\mathbf{w}^{\top}\bar{\mathbf{h}} + b > \tau$\\[0.5mm]
+      {\small\color{muted}$\mathbf{w}, b$: logistic regression}};
     \node[font=\Large] (y) at (11.15,0) {harmful?};
     \draw[flow] (p1.east) -- (h);
     \draw[flow] (p2.east) -- (h);
@@ -675,8 +675,8 @@
   \vspace{6mm}
   {\large Same features, labels and splits: only the read-out differs.\par}
   \raggedright
-  \oursource{layer and threshold or regularization chosen on validation
-    only}
+  \oursource{layer, thresholds $\theta,\tau$ and probe regularization
+    chosen on validation only}
   \note[item]{About 40 s.}
   \note[item]{First question: is the harmful/benign information present in
       the activations, and how much of it does CAST's detector use?}
@@ -686,10 +686,14 @@
   \note[item]{CAST: the condition vector is the first principal component of
       the paired activations; the gate compares a similarity score to a
       threshold.}
-  \note[item]{Probe: a standardized logistic regression trained directly on
-      the labels.}
-  \note[item]{Layer, threshold and regularization are chosen on validation
-      data only; the test prompts are touched once.}
+  \note[item]{Probe: a logistic regression (scikit-learn, L2-regularized,
+      features standardized) trained directly on the labels, on the same
+      balanced harmful/benign training pairs. It is a linear probe: a
+      learned weight vector plus a threshold. As with CAST, its decision
+      threshold $\tau$ is chosen on validation, not fixed at 0.}
+  \note[item]{Layer, thresholds and the regularization strength $C$ (from
+      0.01, 0.1, 1, 10) are chosen on validation data only; the test prompts
+      are touched once.}
 \end{frame}
 
 \begin{frame}{Representation: probe vs.\ CAST detector}
