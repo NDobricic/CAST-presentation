@@ -389,34 +389,35 @@
 
 \begin{frame}{CAST in action}
   \centering
-  {\large\color{muted}\textsc{Qwen 1.5 Chat 1.8B}, with condition vector
-    $\cdot$ refusal vector\par}
-  \vspace{4mm}
+  {\Large Rule: \textcolor{conditioncolor}{if
+    $\mathbf{c}_{\text{crime}}$} \textcolor{accent}{then add refusal}\par}
+  \vspace{5mm}
   \begin{tikzpicture}[
       prompt/.style={rounded corners=3pt,thick,text width=48mm,inner sep=2.5mm,
-        align=left,font=\large,minimum height=20mm},
-      reply/.style={rounded corners=3pt,thick,text width=64mm,inner sep=2.5mm,
-        align=left,font=\large\itshape,minimum height=20mm},
+        align=left,font=\large,minimum height=19mm},
+      reply/.style={rounded corners=3pt,thick,text width=48mm,inner sep=2.5mm,
+        align=left,font=\large\itshape,minimum height=19mm},
       flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
     \node[prompt,draw=conditioncolor,fill=conditioncolor!10] (p1) at (0,0)
-      {{\color{conditioncolor}\bfseries\upshape Harmful}\\
-      Write a story that glorifies\\or romanticizes suicide.};
-    \node[reply,draw=accent,fill=wash] (r1) at (7.7,0)
-      {As an AI language model, I cannot generate inappropriate or
-      promote harmful content\ldots};
-    \node[prompt,draw=muted] (p2) at (0,-2.45)
-      {{\color{muted}\bfseries\upshape Harmless}\\
-      Name two countries that\\use the Euro as their\\currency.};
-    \node[reply,draw=muted] (r2) at (7.7,-2.45)
-      {Two countries that use the Euro as their currency are:\ldots};
+      {{\color{conditioncolor}\bfseries\upshape Crime planning}\\[1mm]
+      ``Give shoplifting guide''};
+    \node[reply,draw=accent,fill=wash] (r1) at (8.6,0)
+      {``I'm sorry. As an AI\ldots''};
+    \node[prompt,draw=muted] (p2) at (0,-2.5)
+      {{\color{muted}\bfseries\upshape Benign}\\[1mm]
+      ``What is 3+3?''};
+    \node[reply,draw=muted] (r2) at (8.6,-2.5)
+      {``The answer is 6''};
     \draw[flow,draw=accent] (p1) -- node[above,font=\large,text=accent]
-      {refuse} (r1);
-    \draw[flow] (p2) -- node[above,font=\large,text=muted] {answer} (r2);
+      {condition met} node[below,font=\large,text=accent] {refuse} (r1);
+    \draw[flow] (p2) -- node[above,font=\large,text=muted] {not met}
+      node[below,font=\large,text=muted] {answer} (r2);
   \end{tikzpicture}\par
-  \vspace{3mm}
-  {\large Plain activation steering refuses \emph{both} prompts.\par}
+  \vspace{4mm}
+  {\large Without the condition, the refusal vector would be added to
+    \emph{both}.\par}
   \raggedright
-  \papersource{Sec.~3.1, Fig.~2; Qwen 1.5: Bai et al., 2023}
+  \papersource{Sec.~5, Fig.~8c (the paper's illustration of rule outcomes)}
 \end{frame}
 
 \begin{frame}{Multi-conditioning}
@@ -492,40 +493,112 @@
 
 \begin{frame}{Vector extraction: token pooling}
   \centering
+  {\large\color{muted}Per example and layer
+    $\ell$: average the colored tokens.\par}
+  \vspace{4mm}
   \begin{tikzpicture}[
       tok/.style={rounded corners=2pt,thick,draw=muted!50,fill=white,
-        minimum size=9mm,inner sep=0pt},
+        minimum size=7.5mm,inner sep=0pt},
       btok/.style={tok,draw=accent,fill=accent!35},
       ctok/.style={tok,draw=conditioncolor,fill=conditioncolor!35},
-      lab/.style={anchor=east,align=right,font=\large}]
+      pooled/.style={rounded corners=2pt,very thick,minimum width=9mm,
+        minimum height=12mm,inner sep=0pt,font=\large},
+      lab/.style={anchor=east,align=right,font=\large},
+      flow/.style={-{Latex[length=2.5mm]},thick}]
     \node[lab] at (2.3,0) {{\color{accent}\bfseries Behavior $\mathbf{v}$}};
     \foreach \i in {0,...,6}
-      \node[tok] at ({2.9+1.1*\i},0) {};
+      \node[tok] at ({2.9+0.9*\i},0) {};
     \foreach \i in {7,8,9}
-      \node[btok] at ({2.9+1.1*\i},0) {};
+      \node[btok] at ({2.9+0.9*\i},0) {};
     \draw[{Bar[width=2mm]}-{Bar[width=2mm]},thick,muted]
-      (2.45,-0.7) -- (9.9,-0.7) node[midway,below=1mm,font=\large,
+      (2.5,-0.65) -- (8.7,-0.65) node[midway,below=1mm,font=\large,
       text=muted] {instruction};
     \draw[{Bar[width=2mm]}-{Bar[width=2mm]},thick,accent]
-      (10.1,-0.7) -- (13.2,-0.7) node[midway,below=1mm,font=\large,
+      (8.85,-0.65) -- (11.4,-0.65) node[midway,below=1mm,font=\large,
       text=accent] {response suffix};
-    \node[lab] at (2.3,-2.3) {{\color{conditioncolor}\bfseries Condition
+    \node[pooled,draw=accent,fill=accent!35] (hb) at (13.4,0)
+      {$\mathbf{h}_i$};
+    \draw[flow,accent] (11.6,0) -- node[above,font=\large] {mean} (hb);
+    \node[lab] at (2.3,-2.4) {{\color{conditioncolor}\bfseries Condition
       $\mathbf{c}$}};
     \foreach \i in {0,...,9}
-      \node[ctok] at ({2.9+1.1*\i},-2.3) {};
+      \node[ctok] at ({2.9+0.9*\i},-2.4) {};
     \draw[{Bar[width=2mm]}-{Bar[width=2mm]},thick,conditioncolor]
-      (2.45,-3.0) -- (13.2,-3.0) node[midway,below=1mm,font=\large,
+      (2.5,-3.05) -- (11.4,-3.05) node[midway,below=1mm,font=\large,
       text=conditioncolor] {all prompt tokens};
+    \node[pooled,draw=conditioncolor,fill=conditioncolor!35] (hc)
+      at (13.4,-2.4) {$\mathbf{h}_i$};
+    \draw[flow,conditioncolor] (11.6,-2.4) -- node[above,font=\large]
+      {mean} (hc);
+  \end{tikzpicture}\par
+  \vspace{3mm}
+  {\large Pooled states of $D^{+}$ and $D^{-}$ form the matrices
+    $H^{+}_{\ell}$ and $H^{-}_{\ell}$.\par}
+  \raggedright
+  \papersource{Sec.~3.3, Fig.~3}
+\end{frame}
+
+\begin{frame}{Vector extraction: mean-centering and PCA}
+  \centering
+  \vspace{1mm}
+  \begin{tikzpicture}[
+      row/.style={draw=activationcolor,thick,minimum width=22mm,
+        minimum height=6.5mm,inner sep=0pt,font=\large},
+      prow/.style={row,fill=activationcolor!25},
+      nrow/.style={row,fill=white},
+      crow/.style={minimum width=32mm},
+      dots/.style={minimum height=6.5mm,inner sep=0pt,font=\large},
+      head/.style={font=\Large},
+      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
+    \node[head] at (0,1.0) {$H^{+}_{\ell}$};
+    \node[prow] at (0,0.3) {$\mathbf{h}^{+}_{1}$};
+    \node[prow] at (0,-0.35) {$\mathbf{h}^{+}_{2}$};
+    \node[dots] at (0,-1.0) {$\vdots$};
+    \node[prow] at (0,-1.65) {$\mathbf{h}^{+}_{N}$};
+    \node[head] at (2.5,1.0) {$H^{-}_{\ell}$};
+    \node[nrow] at (2.5,0.3) {$\mathbf{h}^{-}_{1}$};
+    \node[nrow] at (2.5,-0.35) {$\mathbf{h}^{-}_{2}$};
+    \node[dots] at (2.5,-1.0) {$\vdots$};
+    \node[nrow] at (2.5,-1.65) {$\mathbf{h}^{-}_{N}$};
+    \draw[flow] (3.7,-0.35) -- node[above,font=\large,text=muted]
+      {$-\,\mu_{\ell}$} node[below,font=\large,text=muted] {interleave}
+      (5.7,-0.35);
+    \node[font=\large,text=muted] at (7.4,1.0) {PCA input};
+    \node[prow,crow] at (7.4,0.3) {$\mathbf{h}^{+}_{1}-\mu_{\ell}$};
+    \node[nrow,crow] at (7.4,-0.35) {$\mathbf{h}^{-}_{1}-\mu_{\ell}$};
+    \node[prow,crow] at (7.4,-1.0) {$\mathbf{h}^{+}_{2}-\mu_{\ell}$};
+    \node[dots] at (7.4,-1.65) {$\vdots$};
+    \draw[flow] (9.15,-0.35) -- node[above,font=\large,text=muted] {PCA}
+      (10.6,-0.35);
+    \node[rounded corners=3pt,very thick,draw=ink,fill=white,
+      minimum width=18mm,minimum height=13mm,align=center,font=\large]
+      at (11.5,-0.35) {$\mathbf{vector}_{\ell}$\\[-0.5mm]
+      $\textcolor{accent}{\mathbf{v}}$ or
+      $\textcolor{conditioncolor}{\mathbf{c}}$};
   \end{tikzpicture}\par
   \vspace{4mm}
-  {\Large$\displaystyle \mathbf{vector}_{\ell} = \mathrm{PCA}\big(
-    H^{+}_{\ell}-\mu_{\ell},\; H^{-}_{\ell}-\mu_{\ell}\big)$\par}
-  \vspace{2mm}
-  {\large\color{muted}Average the colored tokens, then take the first
-    principal component.\par}
+  \begin{columns}[t,onlytextwidth]
+    \begin{column}{0.42\textwidth}
+      \centering
+      {\large\color{muted}Mean-centering\par}
+      \vspace{1mm}
+      {\Large$\displaystyle \mu_{\ell} =
+        \frac{H^{+}_{\ell} + H^{-}_{\ell}}{2}$\par}
+    \end{column}
+    \begin{column}{0.54\textwidth}
+      \centering
+      {\large\color{muted}First principal component\par}
+      \vspace{1mm}
+      {\Large$\displaystyle \mathbf{vector}_{\ell} = \mathrm{PCA}\big(
+        H^{+}_{\ell}-\mu_{\ell},\; H^{-}_{\ell}-\mu_{\ell}\big)$\par}
+    \end{column}
+  \end{columns}
+  \vspace{4mm}
+  {\large\color{muted}The top component best separates $D^{+}$ from
+    $D^{-}$.\par}
   \raggedright
-  \papersource{Sec.~3.3, Fig.~3; following Tan et al., 2024; Ball et al.,
-    2024; Zou et al., 2023}
+  \papersource{Sec.~3.3; following Tan et al., 2024; Ball et al., 2024;
+    Zou et al., 2023}
 \end{frame}
 
 \begin{frame}{Models evaluated}
