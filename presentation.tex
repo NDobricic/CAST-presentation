@@ -1108,49 +1108,5 @@
       long-context prompts.}
 \end{frame}
 
-\begin{frame}{Backup: nonlinear similarity}
-  \centering
-  {\Large Does CAST need its nonlinear similarity function?\par}
-  \vspace{2mm}
-  {\large\color{muted}Held-out test F1\enspace$\cdot$\enspace each score at
-    its own validation-chosen layer\par}
-  \vspace{3mm}
-  \begin{tikzpicture}[
-      card/.style={rounded corners=4pt,very thick,minimum width=50mm,
-        minimum height=50mm},
-      num/.style={font=\LARGE\bfseries},
-      model/.style={anchor=east,font=\large}]
-    \node[card,draw=conditioncolor,fill=conditioncolor!10] at (3.0,-0.8) {};
-    \node[card,draw=muted!60] at (8.6,-0.8) {};
-    \node[font=\Large\bfseries,text=conditioncolor] at (3.0,1.35)
-      {CAST similarity};
-    \node[font=\Large\bfseries,text=muted] at (8.6,1.35) {Direct cosine};
-    \node[font=\large] at (3.0,0.65)
-      {$\cos\big(\mathbf{h},\,\tanh(\mathrm{proj}_{\mathbf{c}}\,\mathbf{h})\big)$};
-    \node[font=\large] at (8.6,0.65) {$\cos(\mathbf{h},\,\mathbf{c})$};
-    \foreach \y/\m/\a/\b in {-0.15/Qwen3-8B/0.989/0.840,
-        -0.9/OLMo2-7B/0.900/0.928,-1.65/Granite3.3-8B/0.863/0.813,
-        -2.4/Hermes3-8B/0.848/0.813}{
-      \node[model] at (0.2,\y) {\m};
-      \node[num,text=conditioncolor] at (3.0,\y) {\a};
-      \node[num,text=muted] at (8.6,\y) {\b};}
-  \end{tikzpicture}\par
-  \raggedright
-  \oursource{CAST similarity from Lee et al., Sec.~3.1}
-  \note[item]{Backup slide; use only if asked.}
-  \note[item]{Same condition vectors and features; each score gets its own
-      layer, threshold and direction chosen on validation, with the
-      runtime's FP16 arithmetic.}
-  \note[item]{With the layer chosen freely, CAST's similarity beats direct
-      cosine on three of four models, by up to 0.15 on Qwen3. OLMo2 is the
-      exception. They also end up at different layers (Qwen3: 24 vs.\ 6).}
-  \note[item]{Our earlier fixed-layer comparison (layer 8, float64) found the
-      opposite on three models, so the answer depends on the layer.}
-  \note[item]{Without $\tanh$: $\cos(\mathbf{h},\mathrm{proj}_{\mathbf{c}}
-      \mathbf{h}) = |\cos(\mathbf{h},\mathbf{c})|$ for nonzero projections.
-      Projection alone adds no similarity information; the $\tanh$ changes
-      the score.}
-\end{frame}
-
 % Add future slides above. Keep citations inline; no external .bib is needed.
 \end{document}
