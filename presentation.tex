@@ -310,8 +310,9 @@
   \papersource{Sec.~1 (following Hu et al., 2024) and Sec.~3.1}
 \end{frame}
 
-\begin{frame}{The CAST mechanism}
+\begin{frame}{CAST: conditioning the update}
   \centering
+  \vspace{4mm}
   {\Large$\displaystyle
     \textcolor{activationcolor}{\mathbf{h}}' \leftarrow
     \textcolor{activationcolor}{\mathbf{h}}
@@ -319,70 +320,119 @@
       \textcolor{activationcolor}{\mathbf{h}},\,
       \mathrm{proj}_{\textcolor{conditioncolor}{\mathbf{c}}}
       \textcolor{activationcolor}{\mathbf{h}})\big)}_{%
-      \text{\large\color{conditioncolor}switch: 0 or 1}}
+      \text{\large\color{conditioncolor}condition check: 0 or 1}}
     \cdot
     \underbrace{\alpha\cdot\textcolor{accent}{\mathbf{v}}}_{%
       \text{\large\color{accent}behavior}}$\par}
-  \vspace{6mm}
-  \begin{columns}[c,onlytextwidth]
-    \begin{column}{0.40\textwidth}
+  \vspace{10mm}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
       \centering
-      {\large$\displaystyle \textcolor{conditioncolor}{f}(s) =
+      {\large\color{muted}Projection onto the condition vector\par}
+      \vspace{3mm}
+      {\Large$\displaystyle \mathrm{proj}_{\mathbf{c}}\mathbf{h}
+        = \frac{\mathbf{c}\otimes\mathbf{c}}{\mathbf{c}\cdot\mathbf{c}}\,
+        \mathbf{h}$\par}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering
+      {\large\color{muted}Cosine similarity\par}
+      \vspace{3mm}
+      {\Large$\displaystyle \mathrm{sim}(\mathbf{h},\mathbf{g})
+        = \frac{\mathbf{h}\cdot\mathbf{g}}{|\mathbf{h}|\,|\mathbf{g}|}$\par}
+    \end{column}
+  \end{columns}
+  \vspace{9mm}
+  {\large $\textcolor{conditioncolor}{f}=0$: the model runs unchanged.\qquad
+    $\textcolor{conditioncolor}{f}=1$: standard ActAdd.\par}
+  \raggedright
+  \papersource{Sec.~3.1}
+\end{frame}
+
+\begin{frame}{The step function $f$ acts as a switch}
+  \vspace{5mm}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.46\textwidth}
+      \centering
+      {\Large$\displaystyle \textcolor{conditioncolor}{f}(s) =
         \begin{cases}
-          \textcolor{accent}{1} & \text{if } s > \textcolor{conditioncolor}{\theta}\\
+          1 & \text{if } s > \theta\\
           0 & \text{otherwise}
         \end{cases}$\par}
       \vspace{4mm}
-      {\large\color{muted}$s$: cosine similarity between\\
-        $\mathbf{h}$ and its projection onto $\mathbf{c}$\par}
+      {\large\color{muted}$s = \mathrm{sim}(\mathbf{h},
+        \mathrm{proj}_{\mathbf{c}}\mathbf{h})$:\\how strongly
+        the condition\\is present\par}
     \end{column}
-    \begin{column}{0.56\textwidth}
+    \begin{column}{0.52\textwidth}
       \centering
       \begin{tikzpicture}[font=\large]
-        \draw[->,muted!60] (0,0) -- (6.4,0) node[below left,text=muted] {$s$};
-        \draw[->,muted!60] (0,0) -- (0,2.4)
-          node[left] {$\textcolor{conditioncolor}{f}$};
+        \draw[->,muted!60] (0,0) -- (5.6,0) node[right] {$s$};
+        \draw[->,muted!60] (0,0) -- (0,2.5)
+          node[above] {$\textcolor{conditioncolor}{f}$};
         \node[left,text=muted] at (0,0) {0};
-        \node[left,text=muted] at (0,1.7) {1};
-        \draw[dashed,muted!50] (3,0) -- (3,1.7);
-        \node[below=1.5mm,text=conditioncolor] at (3,0) {$\theta$};
-        \draw[ultra thick,muted] (0,0) -- (3,0);
-        \draw[ultra thick,accent] (3,1.7) -- (6,1.7);
-        \fill[muted] (3,0) circle (1.4mm);
-        \draw[accent,thick,fill=white] (3,1.7) circle (1.4mm);
-        \node[above,text=accent] at (4.5,1.75) {add $\alpha\mathbf{v}$};
-        \node[above,text=muted] at (1.5,0.05) {unchanged};
+        \node[left,text=muted] at (0,1.8) {1};
+        \draw[dashed,muted!50] (2.7,0) -- (2.7,1.8);
+        \node[below=2mm] at (2.7,0) {$\theta$};
+        \draw[ultra thick,muted] (0,0) -- (2.7,0);
+        \draw[ultra thick,accent] (2.7,1.8) -- (5.3,1.8);
+        \fill[muted] (2.7,0) circle (1.3mm);
+        \draw[accent,thick,fill=white] (2.7,1.8) circle (1.3mm);
+        \node[above,text=accent] at (4.0,1.85) {add $\alpha\mathbf{v}$};
+        \node[above,text=muted] at (1.35,0.05) {no steering};
       \end{tikzpicture}
     \end{column}
   \end{columns}
-  \raggedright
-  \papersource{Sec.~3.1; cosine similarity for direction: Hsu et al., 2024}
+  \vspace{8mm}
+  \large
+  \begin{itemize}
+    \setlength{\itemsep}{2mm}
+    \item Cosine similarity checks direction, not magnitude.
+    \item Some layers encode a condition in reverse,
+      so the test can be $s<\theta$.
+  \end{itemize}
+  \papersource{Sec.~3.1}
 \end{frame}
 
 \begin{frame}{CAST during generation}
   \centering
-  {\Large The condition is checked once, on the prompt.\par}
-  \vspace{10mm}
+  {\large The condition is checked once, on the prompt. If it is met, the
+    behavior\\vector is added in every subsequent forward pass.\par}
+  \vspace{5mm}
   \begin{tikzpicture}[
-      box/.style={rounded corners=3pt,thick,minimum height=13mm,
-        align=center,font=\large},
+      layer/.style={minimum width=2.4mm,minimum height=12mm,inner sep=0pt,
+        draw=muted!70,fill=white},
+      cl/.style={layer,draw=conditioncolor,fill=conditioncolor!40},
+      bl/.style={layer,draw=accent,fill=accent!40},
       flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
-    \node[box,draw=muted,minimum width=20mm] (p) at (0.9,0) {Prompt};
-    \node[box,draw=conditioncolor,fill=conditioncolor!10,minimum width=30mm]
-      (chk) at (4.1,0) {first pass:\\check $\mathbf{c}$};
-    \node[diamond,aspect=1.5,thick,draw=conditioncolor,fill=white,
-      inner sep=1pt,font=\large] (dec) at (7.4,0) {$s>\theta$?};
-    \node[box,draw=accent,fill=wash,text width=40mm,anchor=west]
-      (met) at (9.6,1.5) {add $\alpha\mathbf{v}$ at behavior\\layers, every later pass};
-    \node[box,draw=muted,text width=40mm,anchor=west]
-      (no) at (9.6,-1.5) {generate normally};
-    \draw[flow] (p) -- (chk);
-    \draw[flow] (chk) -- (dec);
+    \node[rounded corners=3pt,thick,draw=muted,minimum height=12mm,
+      minimum width=18mm,font=\large] (prompt) at (0,0) {Prompt};
+    \foreach \i/\s in {1/layer,2/cl,3/layer,4/layer,5/layer,6/layer}
+      \node[\s] (a\i) at ({1.3+0.36*\i},0) {};
+    \node[below=2mm of a3.south east,font=\normalsize,text=muted,
+      align=center] {first pass:\\check $\mathbf{c}$};
+    \node[diamond,aspect=1.7,thick,draw=conditioncolor,
+      fill=conditioncolor!10,inner sep=1pt,font=\large] (dec) at (5.05,0)
+      {$s$ vs.\ $\theta$};
+    \foreach \i/\s in {1/layer,2/layer,3/layer,4/bl,5/bl,6/bl}
+      \node[\s] (b\i) at ({6.85+0.36*\i},1.35) {};
+    \foreach \i in {1,...,6}
+      \node[layer] (n\i) at ({6.85+0.36*\i},-1.35) {};
+    \draw[flow] (prompt) -- (a1);
+    \draw[flow] (a6) -- (dec);
     \draw[flow,draw=accent] (dec.north) |- node[pos=0.75,above,
-      font=\large,text=accent] {met} (met.west);
+      font=\normalsize,text=accent] {met} (b1.west);
     \draw[flow] (dec.south) |- node[pos=0.75,below,
-      font=\large,text=muted] {not met} (no.west);
+      font=\normalsize,text=muted] {not met} (n1.west);
+    \node[right=4mm of b6,font=\large,text=accent,align=left]
+      {add $\alpha\mathbf{v}$ at\\behavior layers,\\every later pass};
+    \node[right=4mm of n6,font=\large,text=muted,align=left]
+      {generate normally};
   \end{tikzpicture}\par
+  \vspace{3mm}
+  {\normalsize\textcolor{conditioncolor!40}{\rule{2.5mm}{2.5mm}}\,condition
+    layer\qquad\textcolor{accent!40}{\rule{2.5mm}{2.5mm}}\,behavior
+    layers\par}
   \raggedright
   \papersource{Sec.~3.1; App.~A.2, Fig.~11}
 \end{frame}
