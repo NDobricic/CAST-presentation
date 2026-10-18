@@ -639,58 +639,16 @@
   \papersource{Sec.~4, Fig.~1; all seven tested models}
 \end{frame}
 
-\begin{frame}{Result: comparable to safety-aligned models}
-  \centering
-  {\large\color{muted}Refusal rate (\%) on the held-out test set\par}
-  \vspace{5mm}
-  {\large
-  \renewcommand{\arraystretch}{1.45}
-  \setlength{\tabcolsep}{2.2mm}
-  \begin{tabular}{@{}l cc ccc@{}}
-    & \multicolumn{2}{c}{\color{muted}Reference models}
-    & \multicolumn{3}{c}{\color{accent}\bfseries CAST: base $\rightarrow$ steered}\\
-    & {\normalsize Llama 3.1} & {\normalsize Llama 2}
-    & {\normalsize Qwen 1.5 Chat} & {\normalsize OLMo SFT}
-    & {\normalsize Hermes 2 Pro}\\
-    \hline
-    Harmful $\uparrow$ & 76.2 & 88.4
-      & 45.8 $\rightarrow$ \textbf{90.7} & 53.1 $\rightarrow$ \textbf{86.2}
-      & 19.3 $\rightarrow$ \textbf{83.3}\\
-    Harmless $\downarrow$ & 2.0 & 3.0
-      & 0.0 $\rightarrow$ \textbf{2.2} & 5.2 $\rightarrow$ \textbf{6.0}
-      & 1.0 $\rightarrow$ \textbf{2.4}\\
-    \hline
-    {\color{accent}Gap} & 74.2 & 85.4
-      & {\color{accent}\textbf{88.5}} & {\color{accent}\textbf{80.2}}
-      & {\color{accent}\textbf{80.9}}\\
-  \end{tabular}\par}
-  \vspace{7mm}
-  {\Large Harmful refusal rises sharply; harmless refusal barely moves.\par}
-  \vspace{2mm}
-  {\normalsize\color{muted}Gap: harmful minus harmless.\enspace References:
-    Llama 3.1 Inst 8B, Llama 2 Chat 13B.\par}
-  \raggedright
-  \papersource{Sec.~4, Table~2}
-\end{frame}
-
 \begin{frame}{Conditioning partitions the prompt space}
   \centering
-  \includegraphics[width=\textwidth]{figures/fig4-conditioning-from-inside}\par
-  \vspace{4mm}
-  \begin{columns}[t,onlytextwidth]
-    \begin{column}{0.56\textwidth}
-      {\large\textbf{(a)--(c)} t-SNE of prompts; background is the probability
-        of refusal. Steering raises refusal everywhere; CAST only in the
-        harmful region.\par}
-    \end{column}
-    \begin{column}{0.40\textwidth}
-      {\large\textbf{(d)} The check: at layer~7, steer when\\
-        $\mathrm{sim}(\mathbf{h},\mathrm{proj}_{\mathbf{c}}\mathbf{h})
-        < \textcolor{conditioncolor}{\theta} = 0.048$.\par}
-    \end{column}
-  \end{columns}
+  \includegraphics[width=0.8\textwidth]{figures/fig4ac-conditioning-from-inside}\par
+  \vspace{5mm}
+  {\large t-SNE of prompts; background is the probability of refusal.\par}
+  \vspace{3mm}
+  {\Large Steering raises refusal everywhere;
+    CAST only in the harmful region.\par}
   \raggedright
-  \papersource{Sec.~4, Fig.~4; model: Hermes 2 Pro}
+  \papersource{Sec.~4, Fig.~4a--c; model: Hermes 2 Pro}
 \end{frame}
 
 \begin{frame}{Properties: duality and modulation}
@@ -737,7 +695,7 @@
       {\large (b) Extraction time grows linearly: one forward pass per
         example.\par}
       \vspace{5mm}
-      {\normalsize\color{muted}Authors' explanation: CAST reuses existing
+      {\normalsize\color{muted}CAST reuses the model's existing
         representations, so data quality matters more than volume.\par}
     \end{column}
   \end{columns}
@@ -817,8 +775,8 @@
       {\large\textbf{(b)} Reinforce a model's own refusals, or remove and
         induce at once.\par}
       \vspace{5mm}
-      {\normalsize\color{muted}Authors: mixing removal and induction
-        can weaken induced refusal.\par}
+      {\normalsize\color{muted}Mixing removal and induction can weaken
+        induced refusal.\par}
     \end{column}
   \end{columns}
   \papersource{Sec.~5, Fig.~8a--b; (a) Hermes 2 Pro, (b) Llama 3.1 Inst}
@@ -871,6 +829,71 @@
   \end{columns}
   \papersource{Sec.~5, Fig.~9c; prompting limits: Jang et al., 2023;
     Dekoninck et al., 2023}
+\end{frame}
+
+\appendix
+
+\begin{frame}[plain]
+  \vfill
+  {\small\color{accent}\bfseries APPENDIX}\par
+  \vspace{4mm}
+  {\usebeamerfont{title}Additional results\par}
+  \vfill
+\end{frame}
+
+\begin{frame}{Appendix: comparison with safety-aligned models}
+  \centering
+  {\large\color{muted}Refusal rate (\%) on the held-out test set\par}
+  \vspace{5mm}
+  {\large
+  \renewcommand{\arraystretch}{1.45}
+  \setlength{\tabcolsep}{2.2mm}
+  \begin{tabular}{@{}l cc ccc@{}}
+    & \multicolumn{2}{c}{\color{muted}Reference models}
+    & \multicolumn{3}{c}{\color{accent}\bfseries CAST: base $\rightarrow$ steered}\\
+    & {\normalsize Llama 3.1} & {\normalsize Llama 2}
+    & {\normalsize Qwen 1.5 Chat} & {\normalsize OLMo SFT}
+    & {\normalsize Hermes 2 Pro}\\
+    \hline
+    Harmful $\uparrow$ & 76.2 & 88.4
+      & 45.8 $\rightarrow$ \textbf{90.7} & 53.1 $\rightarrow$ \textbf{86.2}
+      & 19.3 $\rightarrow$ \textbf{83.3}\\
+    Harmless $\downarrow$ & 2.0 & 3.0
+      & 0.0 $\rightarrow$ \textbf{2.2} & 5.2 $\rightarrow$ \textbf{6.0}
+      & 1.0 $\rightarrow$ \textbf{2.4}\\
+    \hline
+    {\color{accent}Gap} & 74.2 & 85.4
+      & {\color{accent}\textbf{88.5}} & {\color{accent}\textbf{80.2}}
+      & {\color{accent}\textbf{80.9}}\\
+  \end{tabular}\par}
+  \vspace{7mm}
+  {\Large Harmful refusal rises sharply; harmless refusal barely moves.\par}
+  \vspace{2mm}
+  {\normalsize\color{muted}Gap: harmful minus harmless.\enspace References:
+    Llama 3.1 Inst 8B, Llama 2 Chat 13B.\par}
+  \raggedright
+  \papersource{Sec.~4, Table~2}
+\end{frame}
+
+\begin{frame}{Appendix: choosing where to check the condition}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.44\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/fig4d-condition-threshold}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      {\large $\mathrm{sim}(\mathbf{h},\mathrm{proj}_{\mathbf{c}}\mathbf{h})$
+        across layers 5--7 for harmless (blue) and harmful (red) training
+        prompts.\par}
+      \vspace{6mm}
+      {\large Grid search picks layer~7 and
+        $\textcolor{conditioncolor}{\theta} = 0.048$:\\
+        steer when $\mathrm{sim} < \textcolor{conditioncolor}{\theta}$.\par}
+      \vspace{6mm}
+      {\normalsize\color{muted}Shaded bands: 25th--75th percentiles.\par}
+    \end{column}
+  \end{columns}
+  \papersource{Sec.~4, Fig.~4d; model: Hermes 2 Pro}
 \end{frame}
 
 % Add future slides above. Keep citations inline; no external .bib is needed.
