@@ -1100,8 +1100,8 @@
     \node[tag,text=accent] at (-4.8,-3.3) {Control};
   \end{tikzpicture}\par
   \vspace{4mm}
-  {\Large\color{accent}Each part can work, but only with per-model
-    validation\\ that includes unfamiliar and long prompts.\par}
+  {\Large\color{accent}The information is there, but detection and
+    control\\ hold only under narrow, tuned conditions.\par}
   \raggedright
   \oursource{four models, settings frozen on validation, held-out test
     prompts}
@@ -1118,9 +1118,10 @@
       of a refusal.}
   \note[item]{Limits: one dataset split with earlier exposure, four 7--9B
       models, refusal only, 50-token replies, model judges.}
-  \note[item]{CAST is an elegant modular design. Each module should be
-      validated on its own, per model, including out-of-distribution and
-      long-context prompts.}
+  \note[item]{Answer to the opening question: finding a direction does not
+      mean we can control behavior. In distribution and with per-model
+      tuning, CAST works on some models; we found no setting that stays
+      reliable once the prompt changes.}
 \end{frame}
 
 \begin{frame}{How we made this deck}
