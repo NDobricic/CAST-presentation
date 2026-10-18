@@ -1003,58 +1003,6 @@
       here.}
 \end{frame}
 
-\begin{frame}{Control: does a better gate give better replies?}
-  \centering
-  {\large\color{muted}Selectivity (\%) = harmful declined $-$ benign
-    declined\enspace$\cdot$\enspace same steering\par}
-  \vspace{4mm}
-  \begin{tikzpicture}[x=0.8cm,y=0.026cm,
-      val/.style={above,font=\normalsize\bfseries},
-      model/.style={below=1mm,font=\large,align=center}]
-    \foreach \y in {0,50,100}{
-      \draw[muted!20] (0,\y) -- (16.8,\y);
-      \node[left,text=muted] at (0,\y) {\y};}
-    \foreach \g/\c/\p/\m/\o in {2.1/94/93/Qwen3-8B/1,6.3/89/92/OLMo2-7B/1,
-        10.5/84/93/Granite3.3-8B/1,14.7/72/90/Hermes3-8B/0.3}{
-      \begin{scope}[opacity=\o]
-        \fill[conditioncolor!70] (\g-1.45,0) rectangle (\g-0.05,\c);
-        \fill[activationcolor] (\g+0.05,0) rectangle (\g+1.45,\p);
-        \node[val,text=conditioncolor] at (\g-0.75,\c) {\c};
-        \node[val,text=activationcolor] at (\g+0.75,\p) {\p};
-        \node[model] at (\g,0) {\m};
-      \end{scope}}
-    \node[font=\normalsize\itshape,text=muted,anchor=north] at (14.7,-28) {judges disagree};
-    \draw[muted!60] (0,0) -- (16.8,0);
-  \end{tikzpicture}\par
-  \vspace{2mm}
-  {\large\textcolor{conditioncolor!70}{\rule{3mm}{3mm}}\,CAST-gated steering
-    \qquad\textcolor{activationcolor}{\rule{3mm}{3mm}}\,Probe-gated
-    steering\par}
-  \vspace{3mm}
-  {\Large\color{accent}A better gate gives clearly better replies only on
-    Granite.\par}
-  \raggedright
-  \oursource{90 harmful + 140 benign test prompts; model judge}
-  \note[item]{About 70 s.}
-  \note[item]{Now both steps together. The probe replaces only CAST's
-      condition step; the refusal vector, layers and strength are identical.
-      We compare the judged replies.}
-  \note[item]{The better detector gives clearly better replies only on
-      Granite: +8.2 points, interval 3.3 to 13.6, and +7.9 under the second
-      judge. Qwen3 ($-$1.5) and OLMo2 (+3.2) are within noise.}
-  \note[item]{Hermes (faded) shows +18.3 under the first judge but only +1.6
-      under the second; the judges disagree about Hermes's steered replies
-      (next slides), so we do not count it.}
-  \note[item]{Why the detection gap shrinks: a missed harmful prompt costs
-      nothing if the model refuses it anyway (unsteered models refuse
-      72--81\% of harmful prompts, Hermes 24\%). On Granite and Hermes,
-      CAST's condition layer also sits above the steering layers, where the
-      library skips steering on the prompt pass; their CAST-gated replies
-      refuse less. A hypothesis, not isolated here.}
-  \note[item]{By our predeclared rule (same direction in 3 of 4 models), this
-      comparison is model-specific.}
-\end{frame}
-
 \begin{frame}{Caveat: what counts as a refusal?}
   \centering
   {\large\color{muted}Steered replies judged as refusals\par}
@@ -1120,9 +1068,6 @@
       160 actually comply; the rest withhold the content, but many contradict
       themselves (``my purpose is to support harmful\ldots'') or give garbled
       reasons. Single reviewer, about $\pm$15 points per model.}
-  \note[item]{A stricter scoring that counts a decline only when both judges
-      agree leaves the earlier gate comparison unchanged for Qwen3, OLMo2 and
-      Granite.}
   \note[item]{Bottom: a human labelled a blinded sample of 60 Hermes replies
       and called only 5 of them clear refusals; 23 of the first judge's 31
       refusals were self-contradictory or garbled non-answers. On harmful
