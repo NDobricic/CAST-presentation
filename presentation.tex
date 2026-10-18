@@ -666,8 +666,7 @@
   \vspace{5mm}
   {\Large\color{accent}One setting for all models fails on both steps.\par}
   \raggedright
-  \oursource{condition layer per seed (3 seeds); steering from a judged
-    validation sweep}
+  \oursource{steering chosen by a judged validation sweep}
   \note[item]{About 50 s.}
   \note[item]{CAST has many choices: where to read the condition, which
       threshold, where to add the behavior vector, and how strongly. The
@@ -718,7 +717,7 @@
   \vspace{3mm}
   {\Large\color{accent}Only on Qwen3 does CAST match the probe.\par}
   \raggedright
-  \oursource{3 seeds; 90 harmful + 140 benign test prompts}
+  \oursource{90 harmful + 140 benign test prompts}
   \note[item]{About 60 s.}
   \note[item]{First question: is the harmful/benign information in the
       activations, and how much of it does CAST's condition vector use?}
@@ -742,7 +741,7 @@
 \begin{frame}{Representation: a pair built to look alike}
   \centering
   {\large\color{muted}XSTest contrast pair\enspace$\cdot$\enspace gate
-    decision, same in all 3 seeds\par}
+    decision\par}
   \vspace{2mm}
   {\large\renewcommand{\arraystretch}{1.25}
   \begin{tabular}{l@{\qquad}cc@{\qquad}cc}
@@ -763,8 +762,7 @@
   {\Large\color{accent}CAST answers both alike; the probe tells them
     apart.\par}
   \raggedright
-  \oursource{prompts from XSTest (R\"ottger et al., 2024); thresholds frozen on
-    our validation split}
+  \oursource{prompts from XSTest (R\"ottger et al., 2024)}
   \note[item]{About 60 s.}
   \note[item]{XSTest pairs safe prompts that sound unsafe with unsafe ones
       that use the same words. On such pairs, surface wording cannot
@@ -785,8 +783,8 @@
 
 \begin{frame}{Representation: all XSTest contrast pairs}
   \centering
-  {\large\color{muted}150 safe/unsafe pairs\enspace$\cdot$\enspace 3
-    seeds\enspace$\cdot$\enspace share of pairs (\%)\par}
+  {\large\color{muted}150 safe/unsafe pairs\enspace$\cdot$\enspace share
+    of pairs (\%)\par}
   \vspace{3mm}
   \begin{tikzpicture}[x=0.085cm,y=1cm,
       sep/.style={fill=accent},bon/.style={fill=failcolor!45},
@@ -824,8 +822,7 @@
   {\Large\color{accent}The probe separates most pairs; CAST only on
     Qwen3.\par}
   \raggedright
-  \oursource{XSTest (R\"ottger et al., 2024); thresholds frozen on our
-    validation split}
+  \oursource{XSTest (R\"ottger et al., 2024)}
   \note[item]{About 60 s.}
   \note[item]{The full version of the previous slide. XSTest writes each
       unsafe prompt as a contrast to one safe prompt in six of its types:
@@ -852,7 +849,7 @@
 
 \begin{frame}{Robustness: adding irrelevant context}
   \centering
-  {\large\color{muted}One benign request\enspace$\cdot$\enspace seed 17\par}
+  {\large\color{muted}One benign request\par}
   \vspace{2mm}
   \begin{tikzpicture}[
       prompt/.style={rounded corners=3pt,thick,draw=muted,text width=40mm,
@@ -890,7 +887,7 @@
   {\large Same request: the added text flips gates, differently in each
     model.\par}
   \raggedright
-  \oursource{exact output, cut at 50 new tokens}
+  \oursource{exact model output}
   \note[item]{About 60 s.}
   \note[item]{Second question: does detection survive a change in context?
       We put a long, irrelevant, harmless passage before a request and check
@@ -925,8 +922,7 @@
   {\Large\color{accent}With added text, the gate no longer follows the
     request.\par}
   \raggedright
-  \oursource{90 harmful + 140 benign test prompts, 3 seeds; frozen
-    thresholds; + context = about 420 words of unrelated text}
+  \oursource{90 harmful + 140 benign test prompts; + context = about 420 words of unrelated text}
   \note[item]{About 70 s. The central robustness finding.}
   \note[item]{Each cell: share of harmful prompts / share of benign prompts on
       which the gate fires. A good gate is near 100 / 0.}
@@ -982,8 +978,7 @@
     \textcolor{accent}{0.5\%}\qquad Granite\enspace
     \textcolor{failcolor}{99.6\%}\,$\rightarrow$\,\textcolor{accent}{1.4\%}\par}
   \raggedright
-  \oursource{seed 17 example; rates over 140 benign prompts, 3 seeds; model
-    judge}
+  \oursource{rates over 140 benign test prompts; model judge}
   \note[item]{About 50 s.}
   \note[item]{Third question: when the gate fires, does adding the vector
       produce the intended behavior?}
@@ -1062,7 +1057,7 @@
   {\Large\color{accent}Half strength already refuses; double breaks the
     model.\par}
   \raggedright
-  \oursource{16 + 16 prompt families, 3 seeds, no gate; model judge}
+  \oursource{16 harmful + 16 benign prompts, no gate; model judge}
   \note[item]{About 60 s.}
   \note[item]{The refusal vector added to every prompt, with no gate, at 0,
       \(\frac14\), \(\frac12\), 1 and 2 times the tuned strength.}
@@ -1112,8 +1107,7 @@
   \vspace{2mm}
   {\Large\color{accent}Only where CAST misses and the model would comply.\par}
   \raggedright
-  \oursource{90 harmful + 140 benign test prompts, 3 seeds; first model
-    judge}
+  \oursource{90 harmful + 140 benign test prompts; model judge}
   \note[item]{About 70 s.}
   \note[item]{Now both steps together. The probe replaces only CAST's
       condition step; the refusal vector, layers and strength are identical.
@@ -1161,7 +1155,7 @@
   {\Large\color{accent}Steering produces refusal-shaped text, not always a
     refusal.\par}
   \raggedright
-  \oursource{seed 17; counts: post hoc AI review; $\kappa$: human labels}
+  \oursource{counts: post hoc AI review; $\kappa$: human labels}
   \note[item]{About 50 s.}
   \note[item]{Both replies come from the request for insulting comments. Both
       decline in practice, they produce no insults, but the wording claims
@@ -1268,7 +1262,7 @@
       \node[num,text=muted] at (8.6,\y) {\b};}
   \end{tikzpicture}\par
   \raggedright
-  \oursource{mean of 3 seeds; CAST similarity from Lee et al., Sec.~3.1}
+  \oursource{CAST similarity from Lee et al., Sec.~3.1}
   \note[item]{Backup slide; use only if asked.}
   \note[item]{Same condition vectors and features; each score gets its own
       layer, threshold and direction chosen on validation, with the
