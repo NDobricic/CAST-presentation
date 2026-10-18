@@ -928,11 +928,10 @@
 
 \begin{frame}{Control: a narrow strength window}
   \centering
-  {\large\color{muted}Steering every prompt\enspace$\cdot$\enspace strength
-    $\alpha$, tuned value in bold\par}
+  {\large\color{muted}Benign prompts, all steered: does the vector force a
+    refusal?\enspace$\cdot$\enspace tuned $\alpha$ in bold\par}
   \vspace{2mm}
   \begin{tikzpicture}[x=0.62cm,y=0.026cm,
-      hl/.style={line width=1.6pt,conditioncolor},
       bl/.style={line width=1.6pt,ink},
       kl/.style={line width=1.6pt,failcolor,dashed}]
     \begin{scope}[xshift=0cm]
@@ -943,7 +942,6 @@
       \node[font=\normalsize\bfseries] at (2,122) {Qwen3-8B};
       \draw[kl] (0,0) -- (1,0) -- (2,0) -- (3,0) -- (4,28);
       \draw[bl] (0,0) -- (1,0) -- (2,29) -- (3,98) -- (4,64);
-      \draw[hl] (0,73) -- (1,94) -- (2,100) -- (3,100) -- (4,93);
     \end{scope}
     \begin{scope}[xshift=3.5cm]
       \foreach \y in {0,50,100} \draw[muted!20] (0,\y) -- (4,\y);
@@ -953,7 +951,6 @@
       \node[font=\normalsize\bfseries] at (2,122) {OLMo2-7B};
       \draw[kl] (0,0) -- (1,0) -- (2,0) -- (3,0) -- (4,93);
       \draw[bl] (0,0) -- (1,13) -- (2,51) -- (3,94) -- (4,5);
-      \draw[hl] (0,75) -- (1,100) -- (2,98) -- (3,90) -- (4,52);
     \end{scope}
     \begin{scope}[xshift=7.0cm]
       \foreach \y in {0,50,100} \draw[muted!20] (0,\y) -- (4,\y);
@@ -963,7 +960,6 @@
       \node[font=\normalsize\bfseries] at (2,122) {Granite3.3-8B};
       \draw[kl] (0,0) -- (1,0) -- (2,0) -- (3,4) -- (4,76);
       \draw[bl] (0,0) -- (1,0) -- (2,9) -- (3,44) -- (4,4);
-      \draw[hl] (0,88) -- (1,96) -- (2,100) -- (3,98) -- (4,24);
     \end{scope}
     \begin{scope}[xshift=10.5cm]
       \foreach \y in {0,50,100} \draw[muted!20] (0,\y) -- (4,\y);
@@ -973,33 +969,34 @@
       \node[font=\normalsize\bfseries] at (2,122) {Hermes3-8B};
       \draw[kl] (0,0) -- (1,0) -- (2,0) -- (3,2) -- (4,91);
       \draw[bl] (0,0) -- (1,0) -- (2,23) -- (3,58) -- (4,9);
-      \draw[hl] (0,25) -- (1,66) -- (2,90) -- (3,90) -- (4,27);
     \end{scope}
     \foreach \y in {0,50,100}
       \node[left,text=muted,font=\small] at (0,\y) {\y\%};
   \end{tikzpicture}\par
   \vspace{2mm}
-  {\normalsize\textcolor{conditioncolor}{\rule[0.8mm]{6mm}{0.6mm}}\,harmful
-    judged decline\qquad
-    \textcolor{ink}{\rule[0.8mm]{6mm}{0.6mm}}\,benign judged decline\qquad
+  {\normalsize\textcolor{ink}{\rule[0.8mm]{6mm}{0.6mm}}\,judged decline\qquad
     \textcolor{failcolor}{\rule[0.8mm]{2mm}{0.6mm}\,\rule[0.8mm]{2mm}{0.6mm}}%
-    \,benign judged broken\par}
+    \,judged broken\par}
   \vspace{2mm}
-  {\Large\color{accent}Half strength already refuses; double breaks the
-    model.\par}
+  {\Large\color{accent}The vector forces refusals only in a narrow band of
+    $\alpha$.\par}
   \raggedright
-  \oursource{16 harmful + 16 benign prompts, no gate; model judge}
-  \note[item]{About 60 s.}
-  \note[item]{The refusal vector added to every prompt, with no gate, at 0,
+  \oursource{16 benign test prompts, no gate; model judge}
+  \note[item]{About 45 s.}
+  \note[item]{No gate here: every prompt gets the refusal vector, at 0,
       \(\frac14\), \(\frac12\), 1 and 2 times each model's tuned strength
       (bold). The x-axis spacing doubles at each step.}
-  \note[item]{At half strength, 90--100\% of harmful prompts are declined in
-      all four models; benign declines rise from there. At double strength
-      every model starts to break: 28\% (Qwen3) to 93\% (OLMo2) of benign
-      replies judged broken.}
-  \note[item]{The tuned strength was chosen to maximize coherent declines,
-      because in CAST the gate, not the strength, decides which prompts are
-      steered.}
+  \note[item]{We show benign prompts because unsteered models refuse none of
+      them, so every refusal here is caused by the vector. In CAST this is
+      what happens to a benign prompt the gate wrongly lets through.}
+  \note[item]{At half the tuned strength the vector forces a refusal on only
+      9--51\% of benign prompts; at the tuned strength on 44--98\%. At double
+      strength replies break (28\% on Qwen3 to 93\% on OLMo2) and coherent
+      refusals fall to 4--64\%.}
+  \note[item]{So the usable range spans about a factor of two to four, and
+      sits at a different value in each model, from 1 to 8.}
+  \note[item]{Harmful prompts are not shown: most models already refuse them
+      without steering, so they say little about the vector.}
   \note[item]{A random vector of the same norm at the tuned strength declines
       no benign prompt, so the effect comes from the refusal direction.}
   \note[item]{Descriptive sweep on a small panel; no strength is selected
