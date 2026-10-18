@@ -1038,37 +1038,30 @@
 
 \begin{frame}{Caveat: how many judged refusals are real?}
   \centering
-  {\large\color{muted}Coherent refusals among 40 sampled judged refusals
-    (AI review)\par}
-  \vspace{2mm}
-  {\renewcommand{\arraystretch}{1.1}
-  \begin{tabular}{c@{\qquad\quad}c@{\qquad\quad}c@{\qquad\quad}c}
-    {\LARGE\bfseries 15} & {\LARGE\bfseries 22} & {\LARGE\bfseries 19}
-    & {\LARGE\bfseries\color{failcolor}3}\\
-    \large Qwen3-8B & \large OLMo2-7B & \large Granite3.3-8B
-    & \large Hermes3-8B\\
-  \end{tabular}\par}
-  \vspace{7mm}
-  {\large\color{muted}Hermes3-8B: refusals among 60 replies, counted by\par}
-  \vspace{2mm}
-  {\renewcommand{\arraystretch}{1.1}
-  \begin{tabular}{c@{\qquad\quad}c@{\qquad\quad}c}
-    {\LARGE\bfseries 5} & {\LARGE\bfseries\color{failcolor}31}
-    & {\LARGE\bfseries\color{failcolor}23}\\
-    \large a human & \large judge 1 & \large judge 2\\
-  \end{tabular}\par}
   \vspace{6mm}
-  {\Large\color{accent}Judged refusal rates overstate coherent refusals.\par}
+  {\large\color{muted}Hermes3-8B: refusals among 60 blinded replies, counted
+    by\par}
+  \vspace{5mm}
+  {\renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{c@{\qquad\qquad}c@{\qquad\qquad}c}
+    {\Huge\bfseries 5} & {\Huge\bfseries\color{failcolor}31}
+    & {\Huge\bfseries\color{failcolor}23}\\
+    \Large a human & \Large judge 1 & \Large judge 2\\
+  \end{tabular}\par}
+  \vspace{10mm}
+  {\Large\color{accent}Both judges overstate refusals, judge 1 strongly.\par}
   \raggedright
-  \oursource{post hoc AI review; human labels for Hermes only}
+  \oursource{human labels for Hermes only}
   \note[item]{About 50 s.}
-  \note[item]{Top, a post hoc check, not planned in advance: 40 randomly sampled
+  \note[item]{Other models, not on the slide: a post hoc check, not planned
+      in advance: 40 randomly sampled
       steered replies per model that the first judge labelled ``clear
       refusal'', read one by one by an AI assistant (not a human). Only 2 of
       160 actually comply; the rest withhold the content, but many contradict
       themselves (``my purpose is to support harmful\ldots'') or give garbled
-      reasons. Single reviewer, about $\pm$15 points per model.}
-  \note[item]{Bottom: a human labelled a blinded sample of 60 Hermes replies
+      reasons. Coherent refusals: Qwen3 15, OLMo2 22, Granite 19, Hermes 3
+      of 40. Single reviewer, about $\pm$15 points per model.}
+  \note[item]{On the slide: a human labelled a blinded sample of 60 Hermes replies
       and called only 5 of them clear refusals; 23 of the first judge's 31
       refusals were self-contradictory or garbled non-answers. On harmful
       prompts the human counted 2 of 10 CAST-gated replies as refusals; the
