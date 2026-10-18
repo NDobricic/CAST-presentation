@@ -647,19 +647,6 @@
     Zou et al., 2023}
 \end{frame}
 
-\begin{frame}{Result: refusal only where the condition holds}
-  \centering
-  \vspace{1mm}
-  \includegraphics[width=0.94\textwidth]{figures/fig1-refusal-all-models}\par
-  \vspace{2mm}
-  {\large\color{muted}Up: refusal of \emph{harmful} prompts.\enspace
-    Down: refusal of \emph{harmless} prompts.\par}
-  \vspace{4mm}
-  {\Large Steering (AST) refuses all; CAST refuses only harmful prompts.\par}
-  \raggedright
-  \papersource{Sec.~4, Fig.~1; all seven tested models}
-\end{frame}
-
 \begin{frame}{Conditioning partitions the prompt space}
   \centering
   \includegraphics[width=0.8\textwidth]{figures/fig4ac-conditioning-from-inside}\par
@@ -795,9 +782,6 @@
       \vspace{5mm}
       {\large\textbf{(b)} Reinforce a model's own refusals, or remove and
         induce at once.\par}
-      \vspace{5mm}
-      {\normalsize\color{muted}Mixing removal and induction can weaken
-        induced refusal.\par}
     \end{column}
   \end{columns}
   \papersource{Sec.~5, Fig.~8a--b; (a) Hermes 2 Pro, (b) Llama 3.1 Inst}
@@ -1508,6 +1492,19 @@
   \papersource{Sec.~4, Table~2}
 \end{frame}
 
+\begin{frame}{Appendix: refusal only where the condition holds}
+  \centering
+  \vspace{1mm}
+  \includegraphics[width=0.94\textwidth]{figures/fig1-refusal-all-models}\par
+  \vspace{2mm}
+  {\large\color{muted}Up: refusal of \emph{harmful} prompts.\enspace
+    Down: refusal of \emph{harmless} prompts.\par}
+  \vspace{4mm}
+  {\Large Steering (AST) refuses all; CAST refuses only harmful prompts.\par}
+  \raggedright
+  \papersource{Sec.~4, Fig.~1; all seven tested models}
+\end{frame}
+
 \begin{frame}{Appendix: choosing where to check the condition}
   \begin{columns}[c,onlytextwidth]
     \begin{column}{0.44\textwidth}
@@ -1527,6 +1524,30 @@
     \end{column}
   \end{columns}
   \papersource{Sec.~4, Fig.~4d; model: Hermes 2 Pro}
+\end{frame}
+
+\begin{frame}{Appendix: two rules during inference}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.60\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/fig8c-rules-at-inference}
+    \end{column}
+    \begin{column}{0.36\textwidth}
+      {\large\textbf{Rule 1:} \textcolor{conditioncolor}{hate, sex,\\
+        or crime} \textcolor{accent}{$\rightarrow$ add refusal}\par}
+      \vspace{3mm}
+      {\large\textbf{Rule 2:} \textcolor{conditioncolor}{legal}
+        \textcolor{accent}{$\rightarrow$ remove refusal}\par}
+      \vspace{7mm}
+      {\large\textbf{A}\enspace Rule 1 fires\\
+        \textbf{B}\enspace no rule fires\\
+        \textbf{C}\enspace Rule 2 fires\par}
+      \vspace{7mm}
+      {\normalsize\color{muted}Each condition has its own layer,
+        $\theta$, and direction.\par}
+    \end{column}
+  \end{columns}
+  \papersource{Sec.~5, Fig.~8c}
 \end{frame}
 
 % Add future slides above. Keep citations inline; no external .bib is needed.
