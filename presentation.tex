@@ -1108,5 +1108,57 @@
       long-context prompts.}
 \end{frame}
 
+\begin{frame}{How we made this deck}
+  \centering
+  {\large\color{muted}One shared source, shared rules, automatic builds\par}
+  \vspace{3mm}
+  \begin{tikzpicture}[
+      box/.style={rounded corners=4pt,very thick,align=center,inner sep=2mm},
+      tool/.style={box,draw=muted,minimum width=31mm,minimum height=12mm},
+      part/.style={box,thick,draw=activationcolor,fill=white,
+        minimum width=40mm,minimum height=10mm},
+      flow/.style={-{Latex[length=2.5mm]},very thick,draw=muted}]
+    \node[tool] (cc) at (0,1.6)
+      {\bfseries Claude Code\\{\small\color{muted}agent harness}};
+    \node[tool] (cu) at (0,0)
+      {\bfseries Cursor\\{\small\color{muted}agent harness}};
+    \node[tool] (in) at (0,-1.6)
+      {\bfseries inscrive.io\\{\small\color{muted}LaTeX in the browser}};
+    \node[box,draw=activationcolor,fill=activationcolor!10,minimum width=46mm,
+      minimum height=52mm] (repo) at (5.3,0) {};
+    \node[font=\bfseries,text=activationcolor] at (5.3,2.15)
+      {GitHub repository};
+    \node[part] at (5.3,1.1)
+      {\bfseries Outline + rules\\{\small\color{muted}for agents and people}};
+    \node[part] at (5.3,-0.2)
+      {\bfseries Style guide\\{\small\color{muted}colors, type, layout}};
+    \node[part] at (5.3,-1.5) {\bfseries One LaTeX source};
+    \foreach \t in {cc,cu,in}{
+      \draw[flow] (\t.east) -- (repo.west|-\t);}
+    \node[box,draw=accent,fill=wash,minimum width=33mm,minimum height=16mm]
+      (ci) at (10.7,0.7)
+      {\bfseries GitHub Action\\{\small\color{muted}builds on every push}};
+    \node[box,draw=muted,minimum width=33mm,minimum height=10mm] (pdf)
+      at (10.7,-1.3) {\bfseries Current PDF\\{\small\color{muted}+ slide
+      previews}};
+    \draw[flow] (repo.east|-ci) -- node[above,font=\small,text=muted] {push}
+      (ci.west);
+    \draw[flow] (ci) -- (pdf);
+  \end{tikzpicture}\par
+  \vspace{3mm}
+  {\Large\color{accent}Shared rules keep everyone's slides coherent.\par}
+  \note[item]{About 40 s.}
+  \note[item]{The deck lives in one GitHub repository. Its agent instructions
+      hold the general outline and the rules every contributor follows; a
+      style guide fixes colors, fonts and layout so that slides written by
+      different people, with different tools, still look like one deck.}
+  \note[item]{Each of us used an AI coding harness: Claude Code and Cursor.
+      Both read the same instructions from the repository.}
+  \note[item]{A GitHub Action rebuilds the PDF from the latest source on every
+      push, so nobody reviews an outdated preview.}
+  \note[item]{For anyone who has trouble building LaTeX locally, the
+      repository is also connected to inscrive.io, an online LaTeX editor.}
+\end{frame}
+
 % Add future slides above. Keep citations inline; no external .bib is needed.
 \end{document}
