@@ -2,6 +2,7 @@
 % Goal: create a presentation of Programming Refusal with Conditional Activation
 % Steering (Lee et al., ICLR 2025). Use the included paper as the primary source.
 % Keep all slide content, styling, diagrams, and references in this one TeX file.
+% Paper figures are vector crops in the figures folder; cite their figure numbers.
 % Keep slides concise: one main idea, readable type, and generous whitespace.
 % Maintain consistent typography, spacing, layouts, and a restrained palette.
 % Use meaningful, consistent diagram colors together with clear labels.
@@ -589,6 +590,287 @@
   \raggedright
   \papersource{Sec.~3.3; following Tan et al., 2024; Ball et al., 2024;
     Zou et al., 2023}
+\end{frame}
+
+\begin{frame}{Conditioned refusal: experimental setup}
+  \centering
+  \vspace{2mm}
+  \begin{tikzpicture}[
+      phase/.style={rounded corners=3pt,thick,minimum height=30mm,
+        text width=36mm,inner sep=2.5mm,align=center,font=\large},
+      head/.style={font=\large\bfseries},
+      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
+    \node[phase,draw=conditioncolor,fill=conditioncolor!10] (d) at (0,0)
+      {{\color{conditioncolor}\bfseries Contrast data}\\[2mm]
+      $D^{+}$: 4{,}050 harmful\\{\normalsize\color{muted}90 per Sorry-Bench\\
+      category, generated}\\[1mm]
+      $D^{-}$: Alpaca};
+    \node[phase,draw=conditioncolor,fill=conditioncolor!10] (c) at (4.75,0)
+      {{\color{conditioncolor}\bfseries Extract}\\[2mm]
+      $\mathbf{c}_{\text{harmful}}$\\[1mm]
+      {\normalsize\color{muted}mean-centered PCA,\\as before}};
+    \node[phase,draw=conditioncolor,fill=conditioncolor!10] (g) at (9.5,0)
+      {{\color{conditioncolor}\bfseries Grid search}\\[2mm]
+      layer $\ell$, threshold $\theta$,\\direction ${>}$ or ${<}$\\[1mm]
+      {\normalsize\color{muted}best separation of\\$D^{+}$ and $D^{-}$}};
+    \draw[flow] (d) -- (c);
+    \draw[flow] (c) -- (g);
+  \end{tikzpicture}\par
+  \vspace{6mm}
+  {\Large Rule: \textcolor{conditioncolor}{if $\mathbf{c}_{\text{harmful}}$}
+    \textcolor{accent}{then add $\mathbf{v}_{\text{refusal}}$}\par}
+  \vspace{3mm}
+  {\large\color{muted}Tested on 450 unseen harmful and 500 unseen harmless
+    prompts\par}
+  \raggedright
+  \papersource{Sec.~4; App.~C; harm categories: Xie et al., 2024b}
+\end{frame}
+
+\begin{frame}{Result: refusal only where the condition holds}
+  \centering
+  \vspace{1mm}
+  \includegraphics[width=0.94\textwidth]{figures/fig1-refusal-all-models}\par
+  \vspace{2mm}
+  {\large\color{muted}Up: refusal of \emph{harmful} prompts.\enspace
+    Down: refusal of \emph{harmless} prompts.\par}
+  \vspace{4mm}
+  {\Large Steering (AST) refuses all; CAST refuses only harmful prompts.\par}
+  \raggedright
+  \papersource{Sec.~4, Fig.~1; all seven tested models}
+\end{frame}
+
+\begin{frame}{Result: comparable to safety-aligned models}
+  \centering
+  {\large\color{muted}Refusal rate (\%) on the held-out test set\par}
+  \vspace{5mm}
+  {\large
+  \renewcommand{\arraystretch}{1.45}
+  \setlength{\tabcolsep}{2.2mm}
+  \begin{tabular}{@{}l cc ccc@{}}
+    & \multicolumn{2}{c}{\color{muted}Reference models}
+    & \multicolumn{3}{c}{\color{accent}\bfseries CAST: base $\rightarrow$ steered}\\
+    & {\normalsize Llama 3.1} & {\normalsize Llama 2}
+    & {\normalsize Qwen 1.5 Chat} & {\normalsize OLMo SFT}
+    & {\normalsize Hermes 2 Pro}\\
+    \hline
+    Harmful $\uparrow$ & 76.2 & 88.4
+      & 45.8 $\rightarrow$ \textbf{90.7} & 53.1 $\rightarrow$ \textbf{86.2}
+      & 19.3 $\rightarrow$ \textbf{83.3}\\
+    Harmless $\downarrow$ & 2.0 & 3.0
+      & 0.0 $\rightarrow$ \textbf{2.2} & 5.2 $\rightarrow$ \textbf{6.0}
+      & 1.0 $\rightarrow$ \textbf{2.4}\\
+    \hline
+    {\color{accent}Gap} & 74.2 & 85.4
+      & {\color{accent}\textbf{88.5}} & {\color{accent}\textbf{80.2}}
+      & {\color{accent}\textbf{80.9}}\\
+  \end{tabular}\par}
+  \vspace{7mm}
+  {\Large Harmful refusal rises sharply; harmless refusal barely moves.\par}
+  \vspace{2mm}
+  {\normalsize\color{muted}Gap: harmful minus harmless.\enspace References:
+    Llama 3.1 Inst 8B, Llama 2 Chat 13B.\par}
+  \raggedright
+  \papersource{Sec.~4, Table~2}
+\end{frame}
+
+\begin{frame}{Conditioning partitions the prompt space}
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig4-conditioning-from-inside}\par
+  \vspace{4mm}
+  \begin{columns}[t,onlytextwidth]
+    \begin{column}{0.56\textwidth}
+      {\large\textbf{(a)--(c)} t-SNE of prompts; background is the probability
+        of refusal. Steering raises refusal everywhere; CAST only in the
+        harmful region.\par}
+    \end{column}
+    \begin{column}{0.40\textwidth}
+      {\large\textbf{(d)} The check: at layer~7, steer when\\
+        $\mathrm{sim}(\mathbf{h},\mathrm{proj}_{\mathbf{c}}\mathbf{h})
+        < \textcolor{conditioncolor}{\theta} = 0.048$.\par}
+    \end{column}
+  \end{columns}
+  \raggedright
+  \papersource{Sec.~4, Fig.~4; model: Hermes 2 Pro}
+\end{frame}
+
+\begin{frame}{Properties: duality and modulation}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.52\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/fig5-duality-modulation}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      {\Large\bfseries\color{conditioncolor}Duality\par}
+      \vspace{1.5mm}
+      {\large Flip the comparison ($<$ to $>$): steer on the
+        \emph{exact complement} of inputs, e.g.\ refuse harmless prompts
+        (a\,$\rightarrow$\,d).\par}
+      \vspace{7mm}
+      {\Large\bfseries\color{conditioncolor}Modulation\par}
+      \vspace{1.5mm}
+      {\large Moving $\theta$ tightens or loosens the guardrail
+        (a\,$\rightarrow$\,b\,$\rightarrow$\,c).\par}
+      \vspace{4mm}
+      {\normalsize\color{muted}Experiments use the $\theta$ from grid search,
+        which maximizes F1.\par}
+    \end{column}
+  \end{columns}
+  \papersource{Sec.~4, Fig.~5; App.~C.2}
+\end{frame}
+
+\begin{frame}{Properties: saturation and linear cost}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.52\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/fig6-saturation}\par
+      \vspace{2mm}
+      {\normalsize\color{muted}Qwen 1.5 1.8B, Danube 4B, OLMo 7B\par}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      {\Large\bfseries\color{accent}Saturation\par}
+      \vspace{1.5mm}
+      {\large (a) Performance plateaus early as contrast
+        examples are added.\par}
+      \vspace{7mm}
+      {\Large\bfseries\color{accent}Linear cost\par}
+      \vspace{1.5mm}
+      {\large (b) Extraction time grows linearly: one forward pass per
+        example.\par}
+      \vspace{5mm}
+      {\normalsize\color{muted}Authors' explanation: CAST reuses existing
+        representations, so data quality matters more than volume.\par}
+    \end{column}
+  \end{columns}
+  \papersource{Sec.~4, Fig.~6}
+\end{frame}
+
+\begin{frame}{Programmed refusal: fine-grained conditions}
+  \centering
+  \begin{tikzpicture}[
+      cat/.style={rounded corners=3pt,thick,draw=conditioncolor,
+        fill=conditioncolor!10,minimum width=27mm,minimum height=7.5mm,
+        font=\large},
+      base/.style={cat,draw=muted,fill=white},
+      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
+    \node[base,minimum height=14mm,align=center] (a) at (0,0)
+      {1{,}200 Alpaca\\prompts};
+    \node[base] (b0) at (5,2.2) {base (benign)};
+    \node[cat] (b1) at (5,1.32) {sexual content};
+    \node[cat] (b2) at (5,0.44) {legal opinion};
+    \node[cat] (b3) at (5,-0.44) {hate speech};
+    \node[cat] (b4) at (5,-1.32) {crime planning};
+    \node[cat] (b5) at (5,-2.2) {health consult.};
+    \foreach \n in {b1,b2,b3,b4,b5}
+      \draw[flow] (a.east) -- (\n.west);
+    \draw[flow,dashed] (a.east) -- (b0.west);
+    \node[below=2mm of a,font=\normalsize,text=muted,align=center]
+      {paraphrased into\\five categories};
+    \node[anchor=west,align=left,font=\large] at (7.1,1.4)
+      {{\bfseries 6 categories} $\times$ 1{,}200\\
+      {\color{muted}700 train\,/\,500 test each}};
+    \node[anchor=west,align=left,font=\large] at (7.1,-1.0)
+      {For each target $\textcolor{conditioncolor}{\mathbf{c}}$:\\[1mm]
+      $D^{+}$: 700 target prompts, ${\times}5$\\
+      $D^{-}$: 700 ${\times}$ 5 other categories};
+  \end{tikzpicture}\par
+  \vspace{5mm}
+  {\Large One condition vector per category, composable into rules.\par}
+  \raggedright
+  \papersource{Sec.~5; categories from Liu et al., 2023}
+\end{frame}
+
+\begin{frame}{Inducing or removing refusal per category}
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/fig7a-induce-refusal}\par
+  \vspace{3mm}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.47\textwidth}
+      \centering
+      \includegraphics[width=0.94\textwidth]{figures/fig7b-suppress-refusal}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      {\large Each pie: refusal rate on six categories.\par}
+      \vspace{3mm}
+      {\large\textbf{(a)} \textcolor{accent}{$\rightarrow +$}: add
+        $\mathbf{v}_{\text{refusal}}$ if the condition holds.\par}
+      \vspace{2mm}
+      {\large\textbf{(b)} \textcolor{accent}{$\rightarrow -$}: subtract it,
+        removing refusal.\par}
+    \end{column}
+  \end{columns}
+  \raggedright
+  \papersource{Sec.~5, Fig.~7; (a) Hermes 2 Pro, (b) Llama 3.1 Inst;
+    Arditi et al., 2024}
+\end{frame}
+
+\begin{frame}{Logical composition of conditions}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.66\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/fig8ab-logical-composition}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      {\large\textbf{(a)} OR-combine conditions:\par}
+      {\large\color{conditioncolor}if $\mathbf{c}_{\text{hate}}\lor
+        \mathbf{c}_{\text{legal}}$\,\textcolor{accent}{then $+$}\par}
+      \vspace{5mm}
+      {\large\textbf{(b)} Reinforce a model's own refusals, or remove and
+        induce at once.\par}
+      \vspace{5mm}
+      {\normalsize\color{muted}Authors: mixing removal and induction
+        can weaken induced refusal.\par}
+    \end{column}
+  \end{columns}
+  \papersource{Sec.~5, Fig.~8a--b; (a) Hermes 2 Pro, (b) Llama 3.1 Inst}
+\end{frame}
+
+\begin{frame}{Constraining a model to one domain}
+  \centering
+  {\Large Rule: \textcolor{conditioncolor}{if
+    $\neg\,\mathbf{c}_{\text{health}}$} \textcolor{accent}{then add
+    refusal}\par}
+  \vspace{1mm}
+  {\large\color{muted}Duality: the flipped check fires on everything
+    \emph{outside} the target.\par}
+  \vspace{4mm}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.66\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/fig9ab-constraining}
+    \end{column}
+    \begin{column}{0.30\textwidth}
+      {\large\textbf{(a)} Seen categories: refused except the target.\par}
+      \vspace{5mm}
+      {\large\textbf{(b)} Unseen categories are refused too: gambling,
+        financial advice, privacy violence, malware.\par}
+    \end{column}
+  \end{columns}
+  \raggedright
+  \papersource{Sec.~5, Fig.~9a--b; Hermes 2 Pro; unseen categories from
+    Liu et al., 2023}
+\end{frame}
+
+\begin{frame}{Distinct domains are easier to constrain}
+  \begin{columns}[c,onlytextwidth]
+    \begin{column}{0.46\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/fig9c-semantic-distance}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      {\large Refusal added to other categories grows with the target's
+        semantic distance from them.\par}
+      \vspace{5mm}
+      {\large e.g.\ hate speech constrains better than legal opinion.\par}
+      \vspace{5mm}
+      {\large CAST beats the \textcolor{red!70!black}{prompting baseline}
+        (dotted line) for most categories.\par}
+      \vspace{5mm}
+      {\normalsize\color{muted}Distance: mean cosine distance of sentence
+        embeddings to other categories.\par}
+    \end{column}
+  \end{columns}
+  \papersource{Sec.~5, Fig.~9c; prompting limits: Jang et al., 2023;
+    Dekoninck et al., 2023}
 \end{frame}
 
 % Add future slides above. Keep citations inline; no external .bib is needed.
