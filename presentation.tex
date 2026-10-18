@@ -658,13 +658,10 @@
     OLMo2-7B & 5 of 32 & 18--26 & 4\\
     Granite3.3-8B & 37--38 of 40 & 16--26 & 2\\
     Hermes3-8B & 24--26 of 32 & 10--20 & 1\\
-    \midrule
-    \color{muted}One fixed setting & \color{muted}8 & \color{muted}10--20
-    & \color{muted}4\\
     \bottomrule
   \end{tabular}\par}
-  \vspace{5mm}
-  {\Large\color{accent}One setting for all models fails on both steps.\par}
+  \vspace{6mm}
+  {\Large\color{accent}The best settings differ widely between models.\par}
   \raggedright
   \oursource{steering chosen by a judged validation sweep}
   \note[item]{About 50 s.}
@@ -677,18 +674,18 @@
       validation prompts.}
   \note[item]{The best settings differ a lot: the condition layer ranges from
       layer 5 to layer 38, the strength from 1 to 8.}
-  \note[item]{The cost of not tuning: at a fixed layer 8, CAST's test F1 drops
-      by 0.11 to 0.33 (Qwen3: 0.99 to 0.66). Fixed steering at layers 10--20
-      and strength 4 broke about 99\% of benign replies on OLMo2 and Granite when
-      applied to every prompt; the tuned settings do not.}
+  \note[item]{The cost of not tuning: at a fixed condition layer 8, CAST's test
+      F1 drops by 0.11 to 0.33 (Qwen3: 0.99 to 0.66). Fixed steering at layers
+      10--20 and strength 4 broke about 99\% of benign replies on OLMo2 and
+      Granite when applied to every prompt; the tuned settings break about
+      1\%.}
   \note[item]{So CAST is not plug-and-play: each new model needs labelled
       validation data and a judged sweep.}
 \end{frame}
 
 \begin{frame}{Representation: probe vs.\ CAST detector}
   \centering
-  {\large\color{muted}Held-out test F1\enspace$\cdot$\enspace same
-    hidden states\enspace$\cdot$\enspace layers chosen on validation\par}
+  {\large\color{muted}Test F1, harmful vs.\ benign prompts\par}
   \vspace{4mm}
   \begin{tikzpicture}[x=0.8cm,y=2.6cm,
       val/.style={font=\small\bfseries,text=white},
@@ -783,44 +780,30 @@
 
 \begin{frame}{Representation: all XSTest contrast pairs}
   \centering
-  {\large\color{muted}150 safe/unsafe pairs\enspace$\cdot$\enspace share
-    of pairs (\%)\par}
-  \vspace{3mm}
-  \begin{tikzpicture}[x=0.085cm,y=1cm,
-      sep/.style={fill=accent},bon/.style={fill=failcolor!45},
-      boff/.style={fill=muted!35},rev/.style={fill=failcolor},
-      lab/.style={font=\scriptsize\bfseries}]
-    \foreach \y/\m/\d/\c/\s/\on/\off/\rv in {
-        0/Qwen3-8B/CAST/conditioncolor/54.0/46.0/0/0,
-        -0.5//Probe/activationcolor/79.3/14.9/5.8/0,
-        -1.2/OLMo2-7B/CAST/conditioncolor/10.2/1.3/80.0/8.4,
-        -1.7//Probe/activationcolor/70.2/23.8/5.3/0.7,
-        -2.4/Granite3.3-8B/CAST/conditioncolor/15.6/7.6/64.7/12.2,
-        -2.9//Probe/activationcolor/78.7/17.1/4.2/0,
-        -3.6/Hermes3-8B/CAST/conditioncolor/14.7/3.8/75.3/6.2,
-        -4.1//Probe/activationcolor/68.7/26.0/4.7/0.7}{
-      \node[anchor=east,font=\normalsize\bfseries] at (-14,\y-0.25) {\m};
-      \node[anchor=east,font=\small\bfseries,text=\c] at (-1,\y) {\d};
-      \pgfmathsetmacro{\a}{\s}
-      \pgfmathsetmacro{\b}{\s+\on}
-      \pgfmathsetmacro{\e}{\s+\on+\off}
-      \fill[sep] (0,\y-0.19) rectangle (\a,\y+0.19);
-      \fill[bon] (\a,\y-0.19) rectangle (\b,\y+0.19);
-      \fill[boff] (\b,\y-0.19) rectangle (\e,\y+0.19);
-      \fill[rev] (\e,\y-0.19) rectangle (100,\y+0.19);
-      \ifdim\s pt>9pt\node[lab,text=white] at (\a/2,\y) {\s};\fi
-      \ifdim\on pt>9pt\node[lab] at ({(\a+\b)/2},\y) {\on};\fi
-      \ifdim\off pt>9pt\node[lab] at ({(\b+\e)/2},\y) {\off};\fi
-      \ifdim\rv pt>9pt\node[lab,text=white] at ({(\e+100)/2},\y) {\rv};\fi}
+  {\large\color{muted}150 safe/unsafe pairs\enspace$\cdot$\enspace \% where
+    only the unsafe prompt is gated\par}
+  \vspace{4mm}
+  \begin{tikzpicture}[x=0.8cm,y=0.026cm,
+      val/.style={above,font=\normalsize\bfseries},
+      model/.style={below=1mm,font=\large,align=center}]
+    \foreach \y in {0,50,100}{
+      \draw[muted!20] (0,\y) -- (16.8,\y);
+      \node[left,text=muted] at (0,\y) {\y};}
+    \foreach \g/\c/\p/\m in {2.1/54/79/Qwen3-8B,6.3/10/70/OLMo2-7B,
+        10.5/16/79/Granite3.3-8B,14.7/15/69/Hermes3-8B}{
+      \fill[conditioncolor!70] (\g-1.45,0) rectangle (\g-0.05,\c);
+      \fill[activationcolor] (\g+0.05,0) rectangle (\g+1.45,\p);
+      \node[val,text=conditioncolor] at (\g-0.75,\c) {\c};
+      \node[val,text=activationcolor] at (\g+0.75,\p) {\p};
+      \node[model] at (\g,0) {\m};}
+    \draw[muted!60] (0,0) -- (16.8,0);
   \end{tikzpicture}\par
   \vspace{2mm}
-  {\normalsize\textcolor{accent}{\rule{3mm}{3mm}}\,separated\quad
-    \textcolor{failcolor!45}{\rule{3mm}{3mm}}\,both gated\quad
-    \textcolor{muted!35}{\rule{3mm}{3mm}}\,neither gated\quad
-    \textcolor{failcolor}{\rule{3mm}{3mm}}\,reversed\par}
-  \vspace{1mm}
-  {\Large\color{accent}The probe separates most pairs; CAST only on
-    Qwen3.\par}
+  {\large\textcolor{conditioncolor!70}{\rule{3mm}{3mm}}\,CAST detector\qquad
+    \textcolor{activationcolor}{\rule{3mm}{3mm}}\,Linear probe\par}
+  \vspace{3mm}
+  {\Large\color{accent}The probe separates most pairs; CAST rarely,
+    except on Qwen3.\par}
   \raggedright
   \oursource{XSTest (R\"ottger et al., 2024)}
   \note[item]{About 60 s.}
@@ -829,13 +812,13 @@
       definitions, figurative language, historical events, homonyms, safe
       contexts and safe targets. That gives 150 pairs; two types without a
       one-to-one partner are left out here.}
-  \note[item]{For each pair and seed: separated means only the unsafe prompt
-      is gated, the ideal; both gated or neither gated means the gate cannot
-      tell them apart; reversed means only the safe prompt is gated.}
-  \note[item]{The probe separates 69--79\% of pairs in every model. CAST
-      separates 10--16\% on OLMo2, Granite and Hermes, mostly gating neither,
-      and reverses 6--12\%. On Qwen3 it separates 54\% and gates both in the
-      rest.}
+  \note[item]{A pair is separated when only the unsafe prompt is gated, the
+      ideal. Otherwise the gate fires on both, on neither, or only on the safe
+      prompt (reversed).}
+  \note[item]{The probe separates 69--79\% of pairs in every model; its
+      misses are mostly gating both. CAST separates 10--16\% on OLMo2, Granite
+      and Hermes: it gates neither prompt in 65--80\% of pairs and reverses
+      6--12\%. On Qwen3 it separates 54\% and gates both in the rest.}
   \note[item]{Whole XSTest set (250 safe, 200 unsafe), CAST vs.\ probe:
       AUROC 0.96 vs.\ 0.94 (Qwen3), 0.50 vs.\ 0.89 (OLMo2), 0.62 vs.\ 0.92
       (Granite), 0.68 vs.\ 0.90 (Hermes). Unsafe prompts gated: 100, 16, 30,
@@ -945,36 +928,34 @@
 
 \begin{frame}{Control: does a better gate give better replies?}
   \centering
-  {\large\color{muted}Selectivity = harmful judged decline $-$ benign judged
-    decline\enspace$\cdot$\enspace same steering\par}
-  \vspace{3mm}
-  \begin{tikzpicture}[x=0.8cm,y=0.022cm,
-      val/.style={above,font=\normalsize},
+  {\large\color{muted}Selectivity (\%) = harmful declined $-$ benign
+    declined\enspace$\cdot$\enspace same steering\par}
+  \vspace{4mm}
+  \begin{tikzpicture}[x=0.8cm,y=0.026cm,
+      val/.style={above,font=\normalsize\bfseries},
       model/.style={below=1mm,font=\large,align=center}]
     \foreach \y in {0,50,100}{
       \draw[muted!20] (0,\y) -- (16.8,\y);
       \node[left,text=muted] at (0,\y) {\y};}
-    \foreach \g/\c/\p/\m/\d/\base in {2.1/94.0/92.5/Qwen3-8B/{$-$1.5}/72,
-        6.3/88.9/92.1/OLMo2-7B/{+3.2}/73,
-        10.5/84.4/92.6/Granite3.3-8B/{\bfseries+8.2}/81,
-        14.7/71.7/89.9/Hermes3-8B/{+18.3}/24}{
-      \fill[conditioncolor!70] (\g-1.1,0) rectangle (\g-0.05,\c);
-      \node[val] at (\g-0.575,\c) {\c};
-      \fill[activationcolor] (\g+0.05,0) rectangle (\g+1.1,\p);
-      \node[val,font=\normalsize\bfseries,text=activationcolor]
-        at (\g+0.575,\p) {\p};
-      \node[model] (n) at (\g,0) {\m};
-      \node[below=0mm of n,font=\normalsize] {$\Delta$ = \d};
-      \node[below=5mm of n,font=\footnotesize,text=muted]
-        {unsteered refuses \base\%};}
+    \foreach \g/\c/\p/\m/\o in {2.1/94/93/Qwen3-8B/1,6.3/89/92/OLMo2-7B/1,
+        10.5/84/93/Granite3.3-8B/1,14.7/72/90/Hermes3-8B/0.3}{
+      \begin{scope}[opacity=\o]
+        \fill[conditioncolor!70] (\g-1.45,0) rectangle (\g-0.05,\c);
+        \fill[activationcolor] (\g+0.05,0) rectangle (\g+1.45,\p);
+        \node[val,text=conditioncolor] at (\g-0.75,\c) {\c};
+        \node[val,text=activationcolor] at (\g+0.75,\p) {\p};
+        \node[model] at (\g,0) {\m};
+      \end{scope}}
+    \node[font=\normalsize\itshape,text=muted,anchor=north] at (14.7,-28) {judges disagree};
     \draw[muted!60] (0,0) -- (16.8,0);
   \end{tikzpicture}\par
-  \vspace{1mm}
+  \vspace{2mm}
   {\large\textcolor{conditioncolor!70}{\rule{3mm}{3mm}}\,CAST-gated steering
     \qquad\textcolor{activationcolor}{\rule{3mm}{3mm}}\,Probe-gated
-    steering\qquad$\Delta$ = probe $-$ CAST\par}
-  \vspace{2mm}
-  {\Large\color{accent}Only where CAST misses and the model would comply.\par}
+    steering\par}
+  \vspace{3mm}
+  {\Large\color{accent}A better gate gives clearly better replies only on
+    Granite.\par}
   \raggedright
   \oursource{90 harmful + 140 benign test prompts; model judge}
   \note[item]{About 70 s.}
@@ -984,9 +965,9 @@
   \note[item]{The better detector gives clearly better replies only on
       Granite: +8.2 points, interval 3.3 to 13.6, and +7.9 under the second
       judge. Qwen3 ($-$1.5) and OLMo2 (+3.2) are within noise.}
-  \note[item]{Hermes shows +18.3 under the first judge but only +1.6 under the
-      second; the judges disagree about Hermes's steered replies (next
-      slide), so we do not count it.}
+  \note[item]{Hermes (faded) shows +18.3 under the first judge but only +1.6
+      under the second; the judges disagree about Hermes's steered replies
+      (next slides), so we do not count it.}
   \note[item]{Why the detection gap shrinks: a missed harmful prompt costs
       nothing if the model refuses it anyway (unsteered models refuse
       72--81\% of harmful prompts, Hermes 24\%). On Granite and Hermes,
@@ -1000,6 +981,7 @@
 \begin{frame}{Caveat: what counts as a refusal?}
   \centering
   {\large\color{muted}Steered replies judged as refusals\par}
+  \vspace{4mm}
   \begin{tikzpicture}[
       reply/.style={rounded corners=3pt,thick,text width=118mm,inner sep=2.2mm,
         align=left,font=\small\itshape,
@@ -1015,21 +997,47 @@
       ``I'm able to generate that type of content. Please ask for help with
       that kind of request.''};
   \end{tikzpicture}\par
-  \vspace{2mm}
-  {\large Coherent refusals among 40 sampled judged refusals per model:\par}
-  {\Large Qwen3 15\qquad OLMo2 22\qquad Granite 19\qquad Hermes 3\par}
-  {\normalsize\color{muted}Human labels, Hermes (60 replies): agreement
-    $\kappa$ 0.34 with judge 1, 0.51 with judge 2\par}
-  \vspace{2mm}
+  \vspace{6mm}
   {\Large\color{accent}Steering produces refusal-shaped text, not always a
     refusal.\par}
   \raggedright
-  \oursource{counts: post hoc AI review; $\kappa$: human labels}
-  \note[item]{About 50 s.}
+  \oursource{exact model outputs; two model judges}
+  \note[item]{About 40 s.}
   \note[item]{Both replies come from the request for insulting comments. Both
       decline in practice, they produce no insults, but the wording claims
       the opposite.}
-  \note[item]{A post hoc check, not planned in advance: 40 randomly sampled
+  \note[item]{The two model judges agree well on Qwen3, OLMo2 and Granite
+      (Cohen's $\kappa$ 0.79--0.94 on decline) but poorly on Hermes (0.37 to
+      0.66), where replies like the second one are common.}
+\end{frame}
+
+\begin{frame}{Caveat: how many judged refusals are real?}
+  \centering
+  {\large\color{muted}Coherent refusals among 40 sampled judged refusals
+    (AI review)\par}
+  \vspace{2mm}
+  {\renewcommand{\arraystretch}{1.1}
+  \begin{tabular}{c@{\qquad\quad}c@{\qquad\quad}c@{\qquad\quad}c}
+    {\LARGE\bfseries 15} & {\LARGE\bfseries 22} & {\LARGE\bfseries 19}
+    & {\LARGE\bfseries\color{failcolor}3}\\
+    \large Qwen3-8B & \large OLMo2-7B & \large Granite3.3-8B
+    & \large Hermes3-8B\\
+  \end{tabular}\par}
+  \vspace{7mm}
+  {\large\color{muted}Hermes3-8B: refusals among 60 replies, counted by\par}
+  \vspace{2mm}
+  {\renewcommand{\arraystretch}{1.1}
+  \begin{tabular}{c@{\qquad\quad}c@{\qquad\quad}c}
+    {\LARGE\bfseries 5} & {\LARGE\bfseries\color{failcolor}31}
+    & {\LARGE\bfseries\color{failcolor}23}\\
+    \large a human & \large judge 1 & \large judge 2\\
+  \end{tabular}\par}
+  \vspace{6mm}
+  {\Large\color{accent}Judged refusal rates overstate coherent refusals.\par}
+  \raggedright
+  \oursource{post hoc AI review; human labels for Hermes only}
+  \note[item]{About 50 s.}
+  \note[item]{Top, a post hoc check, not planned in advance: 40 randomly sampled
       steered replies per model that the first judge labelled ``clear
       refusal'', read one by one by an AI assistant (not a human). Only 2 of
       160 actually comply; the rest withhold the content, but many contradict
@@ -1038,16 +1046,13 @@
   \note[item]{A stricter scoring that counts a decline only when both judges
       agree leaves the earlier gate comparison unchanged for Qwen3, OLMo2 and
       Granite.}
-  \note[item]{The two model judges agree well on Qwen3, OLMo2 and Granite
-      (Cohen's $\kappa$ 0.79--0.94 on decline) but poorly on Hermes (0.37 to
-      0.66). Hermes's steering strength was selected with the first judge,
-      which may reward such replies.}
-  \note[item]{A human labelled a blinded sample of 60 Hermes replies. The
-      human called only 5 of them clear refusals; 23 of the first judge's 31
+  \note[item]{Bottom: a human labelled a blinded sample of 60 Hermes replies
+      and called only 5 of them clear refusals; 23 of the first judge's 31
       refusals were self-contradictory or garbled non-answers. On harmful
       prompts the human counted 2 of 10 CAST-gated replies as refusals; the
-      judges counted 10 and 8. Both judges overstate steered refusals on
-      Hermes, the first one strongly.}
+      judges counted 10 and 8. Agreement with the human: Cohen's $\kappa$
+      0.34 (judge 1) and 0.51 (judge 2). Hermes's steering strength was
+      selected with the first judge, which may reward such replies.}
   \note[item]{So judged refusal rates of steered models measure
       refusal-shaped text, and Hermes's reply-level results are not
       reliable.}
@@ -1071,8 +1076,8 @@
       request.}};
     \node[blk,draw=accent,fill=wash] (c) at (0,-3.3)
       {{\large\bfseries 3.\ Reliable behavioral control}\\
-      {\normalsize\color{muted}A narrow, per-model window; refusal-shaped
-      text.}};
+      {\normalsize\color{muted}Needs per-model tuning; refusals are often
+      incoherent.}};
     \draw[flow] (a) -- (b);
     \draw[flow] (b) -- (c);
     \node[tag,text=activationcolor] at (-4.8,0) {Representation};
@@ -1093,9 +1098,9 @@
   \note[item]{2: Because the gate averages over every prompt token, a long
       unrelated passage changes the decision regardless of the request. This
       holds for the probe too.}
-  \note[item]{3: The refusal vector works once layers and strength are tuned
-      per model, in a window between no effect and broken text, and its
-      refusals sometimes say the opposite of a refusal.}
+  \note[item]{3: The refusal vector works only once layers and strength are
+      tuned per model, and its refusals are often garbled or say the opposite
+      of a refusal.}
   \note[item]{Limits: one dataset split with earlier exposure, four 7--9B
       models, refusal only, 50-token replies, model judges.}
   \note[item]{CAST is an elegant modular design. Each module should be
