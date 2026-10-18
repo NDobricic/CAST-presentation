@@ -5,8 +5,11 @@ Steering** (Lee et al., ICLR 2025).
 
 - [`presentation.tex`](presentation.tex): the single presentation source, including
   styling, diagrams, and references. Contains the title slide and slides covering
-  the paper's motivation, background, and the CAST method.
+  the paper's motivation, background, the CAST method, and the experiments of
+  Sections 4 and 5.
 - [`presentation.pdf`](presentation.pdf): the compiled slides, updated automatically on push.
+- [`figures/`](figures): vector crops of the paper's figures used on the
+  result slides (Figs. 1 and 4–9), cut directly from `paper.pdf`.
 - [`paper.pdf`](paper.pdf): the official conference paper, including appendices.
 - [`AGENTS.md`](AGENTS.md): guidance for contributors and coding agents.
 
@@ -14,7 +17,7 @@ Steering** (Lee et al., ICLR 2025).
 
 In [Prism](https://prism.openai.com/), choose **Import**, then **Import a .zip file**,
 and select `cast-presentation-prism.zip`. The archive places `presentation.tex`
-at its root as the only TeX source, alongside the reference `paper.pdf`,
+at its root as the only TeX source, alongside the `figures/` folder, the reference `paper.pdf`,
 `AGENTS.md`, this README, and a compiled snapshot named `preview.pdf`.
 `preview.pdf` is for comparison; compile `presentation.tex` to produce the slides.
 If prompted for the main document, select `presentation.tex` and use pdfLaTeX.
@@ -46,6 +49,8 @@ Path("build").mkdir(exist_ok=True)
 with ZipFile("build/cast-presentation-prism.zip", "w", ZIP_DEFLATED) as archive:
     for name in ("presentation.tex", "paper.pdf", "AGENTS.md", "README.md"):
         archive.write(name, name)
+    for figure in sorted(Path("figures").glob("*.pdf")):
+        archive.write(figure, figure.as_posix())
     archive.write("presentation.pdf", "preview.pdf")
 PY
 ```
@@ -61,7 +66,7 @@ experiment environment is needed.
 | Linux | [TeX Live](https://tug.org/texlive/) and its [installation guide](https://tug.org/texlive/quickinstall.html) |
 | macOS | [MacTeX](https://tug.org/mactex/) |
 | Windows | [MiKTeX installation](https://miktex.org/howto/install-miktex), or [TeX Live](https://tug.org/texlive/) |
-| Browser | Upload `presentation.tex` to [Overleaf](https://www.overleaf.com/) and choose pdfLaTeX |
+| Browser | Upload `presentation.tex` and the `figures/` folder to [Overleaf](https://www.overleaf.com/) and choose pdfLaTeX |
 
 On Debian/Ubuntu, the relevant packages can be installed with:
 
