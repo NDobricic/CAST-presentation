@@ -647,40 +647,6 @@
     Zou et al., 2023}
 \end{frame}
 
-\begin{frame}{Conditioned refusal: experimental setup}
-  \centering
-  \vspace{2mm}
-  \begin{tikzpicture}[
-      phase/.style={rounded corners=3pt,thick,minimum height=30mm,
-        text width=36mm,inner sep=2.5mm,align=center,font=\large},
-      head/.style={font=\large\bfseries},
-      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
-    \node[phase,draw=conditioncolor,fill=conditioncolor!10] (d) at (0,0)
-      {{\color{conditioncolor}\bfseries Contrast data}\\[2mm]
-      $D^{+}$: 4{,}050 harmful\\{\normalsize\color{muted}90 per Sorry-Bench\\
-      category, generated}\\[1mm]
-      $D^{-}$: Alpaca};
-    \node[phase,draw=conditioncolor,fill=conditioncolor!10] (c) at (4.75,0)
-      {{\color{conditioncolor}\bfseries Extract}\\[2mm]
-      $\mathbf{c}_{\text{harmful}}$\\[1mm]
-      {\normalsize\color{muted}mean-centered PCA,\\as before}};
-    \node[phase,draw=conditioncolor,fill=conditioncolor!10] (g) at (9.5,0)
-      {{\color{conditioncolor}\bfseries Grid search}\\[2mm]
-      layer $\ell$, threshold $\theta$,\\direction ${>}$ or ${<}$\\[1mm]
-      {\normalsize\color{muted}best separation of\\$D^{+}$ and $D^{-}$}};
-    \draw[flow] (d) -- (c);
-    \draw[flow] (c) -- (g);
-  \end{tikzpicture}\par
-  \vspace{6mm}
-  {\Large Rule: \textcolor{conditioncolor}{if $\mathbf{c}_{\text{harmful}}$}
-    \textcolor{accent}{then add $\mathbf{v}_{\text{refusal}}$}\par}
-  \vspace{3mm}
-  {\large\color{muted}Tested on 450 unseen harmful and 500 unseen harmless
-    prompts\par}
-  \raggedright
-  \papersource{Sec.~4; App.~C; harm categories: Xie et al., 2024b}
-\end{frame}
-
 \begin{frame}{Result: refusal only where the condition holds}
   \centering
   \vspace{1mm}
@@ -1470,10 +1436,42 @@
 
 \begin{frame}[plain]
   \vfill
-  {\small\color{accent}\bfseries APPENDIX}\par
-  \vspace{4mm}
-  {\usebeamerfont{title}Additional results\par}
+  {\usebeamerfont{title}Appendix\par}
   \vfill
+\end{frame}
+
+\begin{frame}{Appendix: conditioned refusal setup}
+  \centering
+  \vspace{2mm}
+  \begin{tikzpicture}[
+      phase/.style={rounded corners=3pt,thick,minimum height=30mm,
+        text width=36mm,inner sep=2.5mm,align=center,font=\large},
+      head/.style={font=\large\bfseries},
+      flow/.style={-{Latex[length=2.5mm]},thick,draw=muted}]
+    \node[phase,draw=conditioncolor,fill=conditioncolor!10] (d) at (0,0)
+      {{\color{conditioncolor}\bfseries Contrast data}\\[2mm]
+      $D^{+}$: 4{,}050 harmful\\{\normalsize\color{muted}90 per Sorry-Bench\\
+      category, generated}\\[1mm]
+      $D^{-}$: Alpaca};
+    \node[phase,draw=conditioncolor,fill=conditioncolor!10] (c) at (4.75,0)
+      {{\color{conditioncolor}\bfseries Extract}\\[2mm]
+      $\mathbf{c}_{\text{harmful}}$\\[1mm]
+      {\normalsize\color{muted}mean-centered PCA,\\as before}};
+    \node[phase,draw=conditioncolor,fill=conditioncolor!10] (g) at (9.5,0)
+      {{\color{conditioncolor}\bfseries Grid search}\\[2mm]
+      layer $\ell$, threshold $\theta$,\\direction ${>}$ or ${<}$\\[1mm]
+      {\normalsize\color{muted}best separation of\\$D^{+}$ and $D^{-}$}};
+    \draw[flow] (d) -- (c);
+    \draw[flow] (c) -- (g);
+  \end{tikzpicture}\par
+  \vspace{6mm}
+  {\Large Rule: \textcolor{conditioncolor}{if $\mathbf{c}_{\text{harmful}}$}
+    \textcolor{accent}{then add $\mathbf{v}_{\text{refusal}}$}\par}
+  \vspace{3mm}
+  {\large\color{muted}Tested on 450 unseen harmful and 500 unseen harmless
+    prompts\par}
+  \raggedright
+  \papersource{Sec.~4; App.~C; harm categories: Xie et al., 2024b}
 \end{frame}
 
 \begin{frame}{Appendix: comparison with safety-aligned models}
