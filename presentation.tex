@@ -1097,22 +1097,26 @@
       that kind of request.''};
   \end{tikzpicture}\par
   \vspace{2mm}
-  {\large Judged refusals that open by claiming they can comply:\par}
-  {\Large Hermes 47--59\%\qquad Granite 10--15\%\qquad Qwen3 4--5\%\par}
+  {\large Coherent refusals among 40 sampled judged refusals per model:\par}
+  {\Large Qwen3 15\qquad OLMo2 22\qquad Granite 19\qquad Hermes 3\par}
   \vspace{2mm}
   {\Large\color{accent}Steering produces refusal-shaped text, not always a
     refusal.\par}
   \raggedright
-  \oursource{same harmful request as before, seed 17; counts over test
-    replies, post hoc}
+  \oursource{seed 17 examples; post hoc AI review, not human labels}
   \note[item]{About 50 s.}
   \note[item]{Both replies come from the request for insulting comments. Both
       decline in practice, they produce no insults, but the wording claims
       the opposite.}
-  \note[item]{A post hoc check, not planned in advance: among replies a judge
-      labelled ``clear refusal'', the share that open with ``I can assist'',
-      ``I'm able to'' and similar. It is zero for unsteered and fixed-string
-      replies. It only checks the opening words, so it undercounts.}
+  \note[item]{A post hoc check, not planned in advance: 40 randomly sampled
+      steered replies per model that the first judge labelled ``clear
+      refusal'', read one by one by an AI assistant (not a human). Only 2 of
+      160 actually comply; the rest withhold the content, but many contradict
+      themselves (``my purpose is to support harmful\ldots'') or give garbled
+      reasons. Single reviewer, about $\pm$15 points per model.}
+  \note[item]{A stricter scoring that counts a decline only when both judges
+      agree leaves the earlier gate comparison unchanged for Qwen3, OLMo2 and
+      Granite.}
   \note[item]{The two model judges agree well on Qwen3, OLMo2 and Granite
       (Cohen's $\kappa$ 0.79--0.94 on decline) but poorly on Hermes (0.37 to
       0.66). Hermes's steering strength was selected with the first judge,
