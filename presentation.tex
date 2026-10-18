@@ -643,46 +643,6 @@
       paper.}
 \end{frame}
 
-\begin{frame}{Setup: every model needs its own settings}
-  \centering
-  {\large\color{muted}Chosen on validation prompts only\par}
-  \vspace{3mm}
-  {\large\renewcommand{\arraystretch}{1.3}
-  \begin{tabular}{lccc}
-    \toprule
-    & \textcolor{conditioncolor}{\bfseries Condition layer}
-    & \textcolor{accent}{\bfseries Steering layers}
-    & \textcolor{accent}{\bfseries Strength $\alpha$}\\
-    \midrule
-    Qwen3-8B & 24 of 36 & 14--23 & 8\\
-    OLMo2-7B & 5 of 32 & 18--26 & 4\\
-    Granite3.3-8B & 37--38 of 40 & 16--26 & 2\\
-    Hermes3-8B & 24--26 of 32 & 10--20 & 1\\
-    \bottomrule
-  \end{tabular}\par}
-  \vspace{6mm}
-  {\Large\color{accent}The best settings differ widely between models.\par}
-  \raggedright
-  \oursource{steering chosen by a judged validation sweep}
-  \note[item]{About 50 s.}
-  \note[item]{CAST has many choices: where to read the condition, which
-      threshold, where to add the behavior vector, and how strongly. The
-      paper also chooses these per model; we check how far apart they end up.}
-  \note[item]{The condition layer is chosen over all layers on validation
-      prompts; the steering layers and strength by a sweep of five layer
-      windows and six strengths, judged by a model judge, on separate
-      validation prompts.}
-  \note[item]{The best settings differ a lot: the condition layer ranges from
-      layer 5 to layer 38, the strength from 1 to 8.}
-  \note[item]{The cost of not tuning: at a fixed condition layer 8, CAST's test
-      F1 drops by 0.11 to 0.33 (Qwen3: 0.99 to 0.66). Fixed steering at layers
-      10--20 and strength 4 broke about 99\% of benign replies on OLMo2 and
-      Granite when applied to every prompt; the tuned settings break about
-      1\%.}
-  \note[item]{So CAST is not plug-and-play: each new model needs labelled
-      validation data and a judged sweep.}
-\end{frame}
-
 \begin{frame}{Representation: probe vs.\ CAST detector}
   \centering
   {\large\color{muted}Test F1, harmful vs.\ benign prompts\par}
@@ -924,6 +884,125 @@
   \note[item]{This matters because CAST is designed for context-dependent
       control, and real prompts carry system prompts, documents and chat
       history.}
+\end{frame}
+
+\begin{frame}{Control: every model needs its own settings}
+  \centering
+  {\large\color{muted}Chosen on validation prompts only\par}
+  \vspace{3mm}
+  {\large\renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{lccc}
+    \toprule
+    & \textcolor{conditioncolor}{\bfseries Condition layer}
+    & \textcolor{accent}{\bfseries Steering layers}
+    & \textcolor{accent}{\bfseries Strength $\alpha$}\\
+    \midrule
+    Qwen3-8B & 24 of 36 & 14--23 & 8\\
+    OLMo2-7B & 5 of 32 & 18--26 & 4\\
+    Granite3.3-8B & 37--38 of 40 & 16--26 & 2\\
+    Hermes3-8B & 24--26 of 32 & 10--20 & 1\\
+    \bottomrule
+  \end{tabular}\par}
+  \vspace{6mm}
+  {\Large\color{accent}The best settings differ widely between models.\par}
+  \raggedright
+  \oursource{steering chosen by a judged validation sweep}
+  \note[item]{About 50 s.}
+  \note[item]{CAST has many choices: where to read the condition, which
+      threshold, where to add the behavior vector, and how strongly. The
+      paper also chooses these per model; we check how far apart they end up.}
+  \note[item]{The condition layer is chosen over all layers on validation
+      prompts; the steering layers and strength by a sweep of five layer
+      windows and six strengths, judged by a model judge, on separate
+      validation prompts.}
+  \note[item]{The best settings differ a lot: the condition layer ranges from
+      layer 5 to layer 38, the strength from 1 to 8.}
+  \note[item]{The cost of not tuning: at a fixed condition layer 8, CAST's test
+      F1 drops by 0.11 to 0.33 (Qwen3: 0.99 to 0.66). Fixed steering at layers
+      10--20 and strength 4 broke about 99\% of benign replies on OLMo2 and
+      Granite when applied to every prompt; the tuned settings break about
+      1\%.}
+  \note[item]{So CAST is not plug-and-play: each new model needs labelled
+      validation data and a judged sweep.}
+\end{frame}
+
+\begin{frame}{Control: a narrow strength window}
+  \centering
+  {\large\color{muted}Steering every prompt\enspace$\cdot$\enspace strength
+    as a multiple of each model's tuned $\alpha$\par}
+  \vspace{2mm}
+  \begin{tikzpicture}[x=0.62cm,y=0.026cm,
+      hl/.style={line width=1.6pt,conditioncolor},
+      bl/.style={line width=1.6pt,ink},
+      kl/.style={line width=1.6pt,failcolor,dashed}]
+    \begin{scope}[xshift=0cm]
+      \foreach \y in {0,50,100} \draw[muted!20] (0,\y) -- (4,\y);
+      \draw[muted!60] (0,0) -- (4,0);
+      \foreach \x/\l in {0/0,1/{$\frac14$},2/{$\frac12$},3/1,4/2}
+        \node[below,font=\small] at (\x,0) {\l};
+      \node[font=\normalsize\bfseries] at (2,122) {Qwen3-8B};
+      \draw[kl] (0,0) -- (1,0) -- (2,0) -- (3,0) -- (4,28);
+      \draw[bl] (0,0) -- (1,0) -- (2,29) -- (3,98) -- (4,64);
+      \draw[hl] (0,73) -- (1,94) -- (2,100) -- (3,100) -- (4,93);
+    \end{scope}
+    \begin{scope}[xshift=3.5cm]
+      \foreach \y in {0,50,100} \draw[muted!20] (0,\y) -- (4,\y);
+      \draw[muted!60] (0,0) -- (4,0);
+      \foreach \x/\l in {0/0,1/{$\frac14$},2/{$\frac12$},3/1,4/2}
+        \node[below,font=\small] at (\x,0) {\l};
+      \node[font=\normalsize\bfseries] at (2,122) {OLMo2-7B};
+      \draw[kl] (0,0) -- (1,0) -- (2,0) -- (3,0) -- (4,93);
+      \draw[bl] (0,0) -- (1,13) -- (2,51) -- (3,94) -- (4,5);
+      \draw[hl] (0,75) -- (1,100) -- (2,98) -- (3,90) -- (4,52);
+    \end{scope}
+    \begin{scope}[xshift=7.0cm]
+      \foreach \y in {0,50,100} \draw[muted!20] (0,\y) -- (4,\y);
+      \draw[muted!60] (0,0) -- (4,0);
+      \foreach \x/\l in {0/0,1/{$\frac14$},2/{$\frac12$},3/1,4/2}
+        \node[below,font=\small] at (\x,0) {\l};
+      \node[font=\normalsize\bfseries] at (2,122) {Granite3.3-8B};
+      \draw[kl] (0,0) -- (1,0) -- (2,0) -- (3,4) -- (4,76);
+      \draw[bl] (0,0) -- (1,0) -- (2,9) -- (3,44) -- (4,4);
+      \draw[hl] (0,88) -- (1,96) -- (2,100) -- (3,98) -- (4,24);
+    \end{scope}
+    \begin{scope}[xshift=10.5cm]
+      \foreach \y in {0,50,100} \draw[muted!20] (0,\y) -- (4,\y);
+      \draw[muted!60] (0,0) -- (4,0);
+      \foreach \x/\l in {0/0,1/{$\frac14$},2/{$\frac12$},3/1,4/2}
+        \node[below,font=\small] at (\x,0) {\l};
+      \node[font=\normalsize\bfseries] at (2,122) {Hermes3-8B};
+      \draw[kl] (0,0) -- (1,0) -- (2,0) -- (3,2) -- (4,91);
+      \draw[bl] (0,0) -- (1,0) -- (2,23) -- (3,58) -- (4,9);
+      \draw[hl] (0,25) -- (1,66) -- (2,90) -- (3,90) -- (4,27);
+    \end{scope}
+    \foreach \y in {0,50,100}
+      \node[left,text=muted,font=\small] at (0,\y) {\y\%};
+  \end{tikzpicture}\par
+  \vspace{2mm}
+  {\normalsize\textcolor{conditioncolor}{\rule[0.8mm]{6mm}{0.6mm}}\,harmful
+    judged decline\qquad
+    \textcolor{ink}{\rule[0.8mm]{6mm}{0.6mm}}\,benign judged decline\qquad
+    \textcolor{failcolor}{\rule[0.8mm]{2mm}{0.6mm}\,\rule[0.8mm]{2mm}{0.6mm}}%
+    \,benign judged broken\par}
+  \vspace{2mm}
+  {\Large\color{accent}Half strength already refuses; double breaks the
+    model.\par}
+  \raggedright
+  \oursource{16 harmful + 16 benign prompts, no gate; model judge}
+  \note[item]{About 60 s.}
+  \note[item]{The refusal vector added to every prompt, with no gate, at 0,
+      \(\frac14\), \(\frac12\), 1 and 2 times the tuned strength.}
+  \note[item]{At half strength, 90--100\% of harmful prompts are declined in
+      all four models; benign declines rise from there. At double strength
+      every model starts to break: 28\% (Qwen3) to 93\% (OLMo2) of benign
+      replies judged broken.}
+  \note[item]{The tuned strength was chosen to maximize coherent declines,
+      because in CAST the gate, not the strength, decides which prompts are
+      steered.}
+  \note[item]{A random vector of the same norm at the tuned strength declines
+      no benign prompt, so the effect comes from the refusal direction.}
+  \note[item]{Descriptive sweep on a small panel; no strength is selected
+      here.}
 \end{frame}
 
 \begin{frame}{Control: does a better gate give better replies?}
