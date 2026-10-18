@@ -863,7 +863,7 @@
       anchor=west] (p1) at (-2.25,0.75)
       {{\color{muted}\bfseries Original:}\enspace``Summarize the importance
       of the US Constitution.''};
-    \node[font=\small,text=muted,right=5mm of p1] (r0) {all gates off};
+    \node[font=\small,text=muted,right=5mm of p1] (r0) {gate off in all models};
     \draw[flow] (p1.east) -- (r0.west);
     \node[prompt] (p2) at (0,-1.55)
       {{\color{muted}\bfseries + context}\\[1mm]
@@ -874,10 +874,8 @@
       \renewcommand{\arraystretch}{1.15}
       \begin{tabular}{lcccc}
         & Qwen3 & OLMo2 & Granite & Hermes\\
-        \textcolor{conditioncolor}{\bfseries CAST} & \gon & \gon & \goff
-          & \goff\\
-        \textcolor{activationcolor}{\bfseries Probe} & \goff & \gon & \gon
-          & \goff\\
+        \textcolor{conditioncolor}{\bfseries CAST gate} & \gon & \gon
+          & \goff & \goff\\
       \end{tabular}};
     \node[rounded corners=3pt,thick,draw=failcolor,fill=failcolor!8,
       text width=78mm,inner sep=2mm,align=left,font=\small\itshape,
@@ -901,37 +899,31 @@
   \note[item]{The added text is five copies of a neutral paragraph about a
       garden, a library and a cafe, followed by ``The actual request
       follows:''.}
-  \note[item]{Original: every gate is off and every model answers. With the
-      context, CAST's gate turns on in Qwen3 and OLMo2 and the probe's in
-      OLMo2 and Granite, so the refusal vector is added to a harmless
-      request. OLMo2 then refuses.}
+  \note[item]{Original: the gate is off and every model answers. With the
+      context, the gate turns on in Qwen3 and OLMo2, so the refusal vector
+      is added to a harmless request. OLMo2 then refuses.}
   \note[item]{Selection: the same benign prompt as on the earlier version of
       this slide, seed 17. An illustration; rates on the next slide.}
 \end{frame}
 
 \begin{frame}{Robustness: the gate stops reading the request}
   \centering
-  {\large\color{muted}Gate rate (\%) on harmful\,/\,benign test
+  {\large\color{muted}CAST gate rate (\%) on harmful\,/\,benign test
     prompts\par}
   \vspace{3mm}
-  {\large\renewcommand{\arraystretch}{1.3}
-  \begin{tabular}{l@{\qquad}cc@{\qquad}cc}
-    & \multicolumn{2}{c}{\textcolor{conditioncolor}{\bfseries CAST}\qquad}
-    & \multicolumn{2}{c}{\textcolor{activationcolor}{\bfseries Probe}}\\
-    & \small original & \small + context & \small original & \small + context\\
+  {\Large\renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{l@{\qquad}c@{\qquad}c}
+    & \large original & \large + context\\
     \midrule
-    Qwen3-8B & 98\,/\,0 & \textcolor{failcolor}{\bfseries 100\,/\,100}
-      & 96\,/\,0 & \textcolor{failcolor}{\bfseries 100\,/\,45}\\
-    OLMo2-7B & 89\,/\,5 & \textcolor{failcolor}{\bfseries 100\,/\,100}
-      & 97\,/\,0 & \textcolor{failcolor}{\bfseries 100\,/\,100}\\
-    Granite3.3-8B & 90\,/\,12 & \textcolor{failcolor}{\bfseries 0\,/\,0}
-      & 98\,/\,0 & \textcolor{failcolor}{\bfseries 100\,/\,100}\\
-    Hermes3-8B & 87\,/\,12 & \textcolor{failcolor}{\bfseries 24\,/\,33}
-      & 96\,/\,0 & \textcolor{failcolor}{\bfseries 59\,/\,0}\\
+    Qwen3-8B & 98\,/\,0 & \textcolor{failcolor}{\bfseries 100\,/\,100}\\
+    OLMo2-7B & 89\,/\,5 & \textcolor{failcolor}{\bfseries 100\,/\,100}\\
+    Granite3.3-8B & 90\,/\,12 & \textcolor{failcolor}{\bfseries 0\,/\,0}\\
+    Hermes3-8B & 87\,/\,12 & \textcolor{failcolor}{\bfseries 24\,/\,33}\\
     \bottomrule
   \end{tabular}\par}
-  \vspace{4mm}
-  {\Large\color{accent}With added text, neither gate follows the request.\par}
+  \vspace{5mm}
+  {\Large\color{accent}With added text, the gate no longer follows the
+    request.\par}
   \raggedright
   \oursource{90 harmful + 140 benign test prompts, 3 seeds; frozen
     thresholds; + context = about 420 words of unrelated text}
@@ -939,19 +931,17 @@
   \note[item]{Each cell: share of harmful prompts / share of benign prompts on
       which the gate fires. A good gate is near 100 / 0.}
   \note[item]{With the added text, the decision stops depending on the
-      request, in every model and for both detectors, but in different
-      ways: everything gated (OLMo2), nothing gated (Granite's CAST), or
-      harmful prompts mostly missed (Hermes).}
-  \note[item]{Likely cause, not tested causally: both detectors read the mean
-      of all prompt tokens, so 420 words of unrelated text outweigh a short
-      request. This is a weakness of mean-pooled gating, not only of
-      CAST's direction.}
+      request in every model, in different ways: everything gated (Qwen3,
+      OLMo2), nothing gated (Granite), or harmful prompts mostly missed
+      (Hermes).}
+  \note[item]{Likely cause, not tested causally: the gate reads the mean of
+      all prompt tokens, so 420 words of unrelated text outweigh a short
+      request.}
   \note[item]{Other changes: a 40-word preamble naming harmful topics
       (``fraud, malware, violence, and suicide'') gates 66--100\% of benign
-      prompts for both detectors, while a similar-length formatting wrapper
-      gates 0--5\% (Hermes CAST 18\%). Model-written paraphrases raise CAST's
-      benign false gates to 27--33\% on three models; the probe stays at
-      0--2\%.}
+      prompts, while a similar-length formatting wrapper gates 0--5\%
+      (Hermes 18\%). Model-written paraphrases raise benign false gates to
+      27--33\% on three models.}
   \note[item]{This matters because CAST is designed for context-dependent
       control, and real prompts carry system prompts, documents and chat
       history.}
