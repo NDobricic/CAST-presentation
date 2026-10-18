@@ -1080,7 +1080,6 @@
 \begin{frame}{Caveat: what counts as a refusal?}
   \centering
   {\large\color{muted}Steered replies judged as refusals\par}
-  \vspace{1mm}
   \begin{tikzpicture}[
       reply/.style={rounded corners=3pt,thick,text width=118mm,inner sep=2.2mm,
         align=left,font=\small\itshape,
@@ -1099,11 +1098,13 @@
   \vspace{2mm}
   {\large Coherent refusals among 40 sampled judged refusals per model:\par}
   {\Large Qwen3 15\qquad OLMo2 22\qquad Granite 19\qquad Hermes 3\par}
+  {\normalsize\color{muted}Human labels, Hermes (60 replies): agreement
+    $\kappa$ 0.34 with judge 1, 0.51 with judge 2\par}
   \vspace{2mm}
   {\Large\color{accent}Steering produces refusal-shaped text, not always a
     refusal.\par}
   \raggedright
-  \oursource{seed 17 examples; post hoc AI review, not human labels}
+  \oursource{seed 17; counts: post hoc AI review; $\kappa$: human labels}
   \note[item]{About 50 s.}
   \note[item]{Both replies come from the request for insulting comments. Both
       decline in practice, they produce no insults, but the wording claims
@@ -1121,9 +1122,15 @@
       (Cohen's $\kappa$ 0.79--0.94 on decline) but poorly on Hermes (0.37 to
       0.66). Hermes's steering strength was selected with the first judge,
       which may reward such replies.}
+  \note[item]{A human labelled a blinded sample of 60 Hermes replies. The
+      human called only 5 of them clear refusals; 23 of the first judge's 31
+      refusals were self-contradictory or garbled non-answers. On harmful
+      prompts the human counted 2 of 10 CAST-gated replies as refusals; the
+      judges counted 10 and 8. Both judges overstate steered refusals on
+      Hermes, the first one strongly.}
   \note[item]{So judged refusal rates of steered models measure
-      refusal-shaped text. A blinded sample of replies is set aside for
-      human labelling.}
+      refusal-shaped text, and Hermes's reply-level results are not
+      reliable.}
 \end{frame}
 
 \begin{frame}{Conclusion: three different problems}
